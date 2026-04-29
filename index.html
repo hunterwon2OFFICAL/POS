@@ -3,187 +3,208 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cinnamon Web OS</title>
+    <title>Web Mint OS - All-In-One</title>
     <style>
-        /* Cinnamon Desktop Base */
+        /* --- ALL CSS STYLES --- */
         body, html {
-            margin: 0;
-            padding: 0;
-            height: 100%;
+            margin: 0; padding: 0; height: 100%;
             font-family: 'Ubuntu', sans-serif;
             overflow: hidden;
-            background: linear-gradient(135deg, #2c3e50, #000000); /* Mint-like dark gradient */
+            background: linear-gradient(135deg, #2c3e50, #000000);
             color: #fff;
         }
 
-        /* Desktop Area */
         #desktop {
             height: calc(100vh - 40px);
             position: relative;
             padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            align-content: flex-start;
+            flex-wrap: wrap;
         }
 
         .icon {
-            width: 80px;
-            text-align: center;
-            cursor: pointer;
-            padding: 10px;
-            border-radius: 5px;
+            width: 90px; text-align: center; cursor: pointer; padding: 10px;
+            border-radius: 5px; transition: 0.2s;
         }
         .icon:hover { background: rgba(255, 255, 255, 0.1); }
         .icon img { width: 48px; height: 48px; display: block; margin: 0 auto 5px; }
 
-        /* Bottom Panel (Cinnamon Style) */
         #panel {
-            height: 40px;
-            background: rgba(45, 45, 45, 0.95);
-            border-top: 1px solid #444;
-            display: flex;
-            align-items: center;
-            padding: 0 10px;
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            z-index: 1000;
+            height: 40px; background: rgba(35, 35, 35, 0.95);
+            border-top: 1px solid #444; display: flex;
+            align-items: center; padding: 0 10px;
+            position: fixed; bottom: 0; width: 100%; z-index: 1000;
         }
 
         #start-menu-btn {
-            background: #4ea84e; /* Mint green */
-            border: none;
-            padding: 5px 15px;
-            color: white;
-            font-weight: bold;
-            border-radius: 3px;
-            cursor: pointer;
-            margin-right: 10px;
+            background: #4ea84e; border: none; padding: 5px 12px;
+            color: white; font-weight: bold; border-radius: 3px;
+            cursor: pointer; margin-right: 15px;
         }
 
-        /* Terminal Window */
+        /* Unified Window System */
         .window {
-            position: absolute;
-            top: 50px;
-            left: 50px;
-            width: 600px;
-            height: 400px;
-            background: #2b2b2b;
-            border: 1px solid #555;
+            position: absolute; width: 600px; height: 400px;
+            background: #2b2b2b; border: 1px solid #555;
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            display: none;
-            flex-direction: column;
+            display: none; flex-direction: column;
+            border-radius: 6px 6px 0 0; overflow: hidden; z-index: 10;
         }
 
         .window-header {
-            background: #333;
-            padding: 5px 10px;
-            display: flex;
-            justify-content: space-between;
-            cursor: move;
+            background: #333; padding: 8px 12px;
+            display: flex; justify-content: space-between;
+            align-items: center; cursor: move;
+            border-bottom: 1px solid #444;
         }
 
+        .close-btn {
+            background: #e74c3c; border: none; color: white;
+            width: 20px; height: 20px; border-radius: 50%; cursor: pointer;
+        }
+
+        /* Terminal Specifics */
         .terminal-body {
-            flex-grow: 1;
-            padding: 10px;
-            font-family: 'Courier New', monospace;
-            overflow-y: auto;
-            background: #1a1a1a;
-            color: #00ff00;
+            flex-grow: 1; padding: 10px; background: #1a1a1a;
+            color: #00ff00; font-family: monospace; overflow-y: auto;
+        }
+        #terminal-input {
+            background: transparent; border: none; color: white;
+            outline: none; width: 70%; font-family: inherit;
         }
 
-        #terminal-input {
-            background: transparent;
-            border: none;
-            color: white;
-            outline: none;
-            width: 80%;
-            font-family: inherit;
-        }
+        /* Explorer Specifics */
+        .explorer-body { flex-grow: 1; background: #fff; color: #333; display: flex; }
+        .sidebar { width: 140px; background: #f0f0f0; border-right: 1px solid #ccc; padding: 10px; }
+        .sidebar div { padding: 5px; cursor: pointer; border-radius: 3px; font-size: 14px; }
+        .sidebar div:hover { background: #ddd; }
+        .file-grid { flex-grow: 1; padding: 20px; display: grid; grid-template-columns: repeat(auto-fill, 80px); gap: 20px; }
+        .file-item { text-align: center; cursor: pointer; font-size: 12px; }
+        .file-icon { font-size: 30px; }
     </style>
 </head>
 <body>
 
 <div id="desktop">
-    <div class="icon" onclick="toggleTerminal()">
-        <img src="https://flaticon.com" alt="Terminal">
+    <div class="icon" onclick="openWindow('terminal-window')">
+        <img src="https://flaticon.com">
         <span>Terminal</span>
     </div>
+    <div class="icon" onclick="openWindow('explorer-window')">
+        <img src="https://flaticon.com">
+        <span>Home</span>
+    </div>
 </div>
 
-<!-- Bottom Panel -->
 <div id="panel">
     <button id="start-menu-btn">LM</button>
-    <div id="taskbar"></div>
+    <div id="clock" style="margin-left: auto; font-size: 12px; color: #aaa;"></div>
 </div>
 
-<!-- Terminal App -->
+<!-- TERMINAL -->
 <div id="terminal-window" class="window">
-    <div class="window-header">
-        <span>mint@web-os: ~</span>
-        <button onclick="toggleTerminal()" style="background:red; color:white; border:none; cursor:pointer;">X</button>
+    <div class="window-header" onmousedown="startDrag(event, 'terminal-window')">
+        <span>Terminal</span>
+        <button class="close-btn" onclick="closeWindow('terminal-window')">x</button>
     </div>
-    <div class="terminal-body" id="terminal-output">
-        <div>Welcome to Web-Mint Terminal. Type 'help' for commands.</div>
+    <div class="terminal-body" id="term-out">
+        <div>Welcome to Mint Web OS. Type 'help'.</div>
         <div id="log"></div>
-        <span>mint@web-os:~$ </span><input type="text" id="terminal-input" autofocus>
+        <span>mint@web:~$ </span><input type="text" id="terminal-input" autofocus>
+    </div>
+</div>
+
+<!-- EXPLORER -->
+<div id="explorer-window" class="window">
+    <div class="window-header" onmousedown="startDrag(event, 'explorer-window')">
+        <span>File Browser</span>
+        <button class="close-btn" onclick="closeWindow('explorer-window')">x</button>
+    </div>
+    <div class="explorer-body">
+        <div class="sidebar">
+            <div onclick="renderFiles('Home')">Home</div>
+            <div onclick="renderFiles('Documents')">Documents</div>
+            <div onclick="renderFiles('Pictures')">Pictures</div>
+        </div>
+        <div class="file-grid" id="file-display"></div>
     </div>
 </div>
 
 <script>
-    const terminalWindow = document.getElementById('terminal-window');
-    const input = document.getElementById('terminal-input');
-    const log = document.getElementById('log');
+    /* --- ALL JAVASCRIPT LOGIC --- */
+    let activeWin = null;
+    let offset = { x: 0, y: 0 };
 
-    // Toggle Window visibility
-    function toggleTerminal() {
-        terminalWindow.style.display = (terminalWindow.style.display === 'flex') ? 'none' : 'flex';
-        if(terminalWindow.style.display === 'flex') input.focus();
+    function openWindow(id) {
+        const win = document.getElementById(id);
+        win.style.display = 'flex';
+        win.style.zIndex = 100;
+        if(id === 'explorer-window') renderFiles('Home');
     }
 
-    // Terminal Command Logic
-    input.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter') {
-            const command = input.value.trim().toLowerCase();
-            const newLine = document.createElement('div');
-            newLine.innerHTML = `<span>mint@web-os:~$ ${input.value}</span>`;
-            log.appendChild(newLine);
+    function closeWindow(id) {
+        document.getElementById(id).style.display = 'none';
+    }
 
-            const response = document.createElement('div');
-            switch(command) {
-                case 'help':
-                    response.innerHTML = "Available commands: help, clear, whoami, date";
-                    break;
-                case 'clear':
-                    log.innerHTML = '';
-                    break;
-                case 'whoami':
-                    response.innerHTML = "mint-user";
-                    break;
-                case 'date':
-                    response.innerHTML = new Date().toString();
-                    break;
-                case '':
-                    break;
-                default:
-                    response.innerHTML = `Command not found: ${command}`;
-            }
-            
-            log.appendChild(response);
-            input.value = '';
-            document.getElementById('terminal-output').scrollTop = document.getElementById('terminal-output').scrollHeight;
-        }
-    });
+    // Dragging Logic
+    function startDrag(e, id) {
+        activeWin = document.getElementById(id);
+        offset.x = e.clientX - activeWin.offsetLeft;
+        offset.y = e.clientY - activeWin.offsetTop;
+        document.querySelectorAll('.window').forEach(w => w.style.zIndex = 10);
+        activeWin.style.zIndex = 100;
+    }
 
-    // Make window draggable (Simplified)
-    let isDragging = false;
-    const header = document.querySelector('.window-header');
-    header.onmousedown = () => isDragging = true;
-    window.onmouseup = () => isDragging = false;
     window.onmousemove = (e) => {
-        if (isDragging) {
-            terminalWindow.style.left = e.clientX - 300 + 'px';
-            terminalWindow.style.top = e.clientY - 10 + 'px';
+        if(activeWin) {
+            activeWin.style.left = (e.clientX - offset.x) + 'px';
+            activeWin.style.top = (e.clientY - offset.y) + 'px';
         }
-    };
+    }
+
+    window.onmouseup = () => activeWin = null;
+
+    // Terminal Logic
+    const termIn = document.getElementById('terminal-input');
+    const log = document.getElementById('log');
+    termIn.onkeydown = (e) => {
+        if(e.key === 'Enter') {
+            const cmd = termIn.value.toLowerCase();
+            log.innerHTML += `<div>mint@web:~$ ${termIn.value}</div>`;
+            let res = "";
+            if(cmd === 'help') res = "Commands: help, clear, date, whoami";
+            else if(cmd === 'clear') log.innerHTML = "";
+            else if(cmd === 'date') res = new Date().toLocaleString();
+            else if(cmd === 'whoami') res = "mint-user";
+            else if(cmd !== "") res = "Command not found";
+            
+            log.innerHTML += `<div>${res}</div>`;
+            termIn.value = "";
+            document.getElementById('term-out').scrollTop = 9999;
+        }
+    }
+
+    // File Logic
+    const fs = { 'Home':['Docs', 'Pics', 'read.txt'], 'Documents':['work.pdf'], 'Pictures':['vacation.jpg'] };
+    function renderFiles(f) {
+        const display = document.getElementById('file-display');
+        display.innerHTML = '';
+        (fs[f] || []).forEach(item => {
+            const isFile = item.includes('.');
+            display.innerHTML += `<div class="file-item" onclick="${!isFile ? `renderFiles('${item}')` : ''}">
+                <div class="file-icon">${isFile ? '📄' : '📁'}</div>${item}</div>`;
+        });
+    }
+
+    // Clock
+    setInterval(() => {
+        document.getElementById('clock').innerText = new Date().toLocaleTimeString();
+    }, 1000);
 </script>
 
 </body>
 </html>
+
