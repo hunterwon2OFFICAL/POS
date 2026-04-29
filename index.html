@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Web Mint OS v18.0 - Proxy Master</title>
+    <title>Web Mint OS v19.0</title>
     <style>
         * { box-sizing: border-box; }
         body { 
@@ -17,15 +17,25 @@
         .hdr { background: #23272e; padding: 10px; display: flex; justify-content: space-between; align-items: center; cursor: grab; user-select: none; }
         .content { flex-grow: 1; display: flex; flex-direction: column; overflow: hidden; background: #fff; color: #000;}
         .close-btn { background: #e74c3c; color: white; border: none; border-radius: 3px; cursor: pointer; padding: 2px 8px; }
+        
+        /* Terminal */
         #term-box { background: #000; color: #4af626; height: 100%; display: flex; flex-direction: column; padding: 10px; font-family: monospace; }
         #term-hist { flex-grow: 1; overflow-y: auto; white-space: pre-wrap; font-size: 14px; }
         #term-in { background: transparent; color: #fff; border: none; outline: none; flex-grow: 1; font-family: inherit; font-size: 14px; }
-        .settings-item { padding: 15px; border-bottom: 1px solid #eee; color: black; display: flex; flex-direction: column; gap: 5px; }
+        
+        /* Browser */
+        .browser-bar { background: #eee; padding: 10px; display: flex; gap: 8px; border-bottom: 1px solid #ccc; }
+        .browser-bar input { flex-grow: 1; border: 1px solid #bbb; padding: 5px; border-radius: 4px; }
+        iframe { width: 100%; flex-grow: 1; border: none; background: white; }
+
+        /* Explorer */
+        .file-item { padding: 12px; cursor: pointer; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #eee; }
+        .file-item:hover { background: #e8f5e9; }
         .icon { position: absolute; width: 90px; text-align: center; cursor: pointer; padding: 10px; color: white; text-shadow: 1px 1px 4px black; }
         .icon span { font-size: 32px; display: block; margin-bottom: 5px; }
     </style>
 </head>
-<body>
+<body id="os-root">
 
 <div id="desktop">
     <div class="icon" style="top: 20px; left: 20px;" onclick="openWin('t-win')"><span>🖥️</span>Terminal</div>
@@ -33,51 +43,69 @@
     <div class="icon" style="top: 240px; left: 20px;" onclick="openWin('b-win')"><span>🌐</span>Browser</div>
     <div class="icon" style="top: 350px; left: 20px;" onclick="openWin('s-win')"><span>⚙️</span>Settings</div>
 
+    <!-- TERMINAL -->
     <div id="t-win" class="win" style="top: 50px; left: 150px; width: 650px; height: 400px;">
         <div class="hdr"><span>🖥️ Terminal</span><button class="close-btn" onclick="closeWin('t-win')">X</button></div>
-        <div class="content" style="background:#000;">
-            <div id="term-box" onclick="document.getElementById('term-in').focus()">
-                <div id="term-hist">Web-Mint v18.0 | New Commands: echo, pwd, mkdir, cat</div>
-                <div style="display:flex"><span>mint@web:~$ &nbsp;</span><input type="text" id="term-in" spellcheck="false" autocomplete="off"></div>
-            </div>
-        </div>
+        <div class="content" style="background:#000;"><div id="term-box" onclick="document.getElementById('term-in').focus()"><div id="term-hist">Web-Mint v19.0. Type 'help'.</div><div style="display:flex"><span>mint@web:~$ &nbsp;</span><input type="text" id="term-in" spellcheck="false" autocomplete="off"></div></div></div>
     </div>
 
+    <!-- BROWSER (Fixed Proxy) -->
     <div id="b-win" class="win" style="top: 80px; left: 300px; width: 900px; height: 600px;">
-        <div class="hdr"><span>🌐 MintBrowser (Proxy Mode)</span><button class="close-btn" onclick="closeWin('b-win')">X</button></div>
+        <div class="hdr"><span>🌐 Browser (Enhanced Proxy)</span><button class="close-btn" onclick="closeWin('b-win')">X</button></div>
         <div class="content">
-            <div style="background:#eee; padding:10px; display:flex; gap:8px;">
-                <input type="text" id="url-input" style="flex-grow:1; padding:5px;" placeholder="Search Google or type URL...">
+            <div class="browser-bar">
+                <input type="text" id="url-input" placeholder="Enter URL (e.g., google.com)">
                 <button onclick="navBrowser()">Go</button>
             </div>
-            <iframe id="browser-frame" src="https://google.com" style="width:100%; height:100%; border:none;"></iframe>
+            <iframe id="browser-frame" src="https://hypothes.is"></iframe>
         </div>
     </div>
 
-    <div id="s-win" class="win" style="top: 150px; left: 400px; width: 450px; height: 450px;">
+    <!-- EXPLORER -->
+    <div id="e-win" class="win" style="top: 100px; left: 100px; width: 450px;">
+        <div class="hdr"><span>📁 Explorer</span><button class="close-btn" onclick="closeWin('e-win')">X</button></div>
+        <div class="content">
+            <div style="padding:10px; background:#f0f0f0;"><button onclick="createNewFile()">+ New File</button></div>
+            <div id="explorer-view" style="overflow-y:auto; color:black; height:100%;"></div>
+        </div>
+    </div>
+
+    <!-- NOTEPAD (OS Injector) -->
+    <div id="n-win" class="win" style="top: 120px; left: 450px; width: 500px; height: 400px;">
+        <div class="hdr"><span id="note-title">📄 Notepad</span><button class="close-btn" onclick="closeWin('n-win')">X</button></div>
+        <div class="content">
+            <textarea id="editor-area" style="width:100%; height:100%; border:none; padding:15px; outline:none; font-family:monospace;"></textarea>
+            <div style="background:#ddd; padding:8px; display:flex; justify-content: space-between;">
+                <button id="inject-btn" style="background:#2196F3; color:white; border:none; padding:5px 10px; display:none;" onclick="injectOS()">🚀 Run System File</button>
+                <button onclick="saveFile()">💾 Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div id="s-win" class="win" style="top: 150px; left: 400px; width: 450px; height: 350px;">
         <div class="hdr"><span>⚙️ Settings</span><button class="close-btn" onclick="closeWin('s-win')">X</button></div>
-        <div class="content" style="overflow-y:auto;">
-            <div class="settings-item"><b>GitHub Auto-Update URL</b><input type="text" id="gh-url" placeholder="Paste ://githubusercontent.com link here..."><button onclick="startAutoUpdate()">Enable Auto-Update</button></div>
-            <div class="settings-item"><b>Background URL</b><input type="text" id="bg-input"><button onclick="document.body.style.backgroundImage = 'url('+document.getElementById('bg-input').value+')'">Apply Wallpaper</button></div>
-            <div class="settings-item"><b>Panel Color</b><input type="color" onchange="document.getElementById('panel').style.background = this.value"></div>
+        <div class="content">
+            <div style="padding:15px; border-bottom:1px solid #eee; color:black;">Background: <input type="text" id="bg-url-input"><button onclick="applyBg()">Apply</button></div>
+            <div style="padding:15px; border-bottom:1px solid #eee; color:black;">GitHub Sync: <input type="text" id="gh-sync-input"><button onclick="startSync()">Sync</button></div>
         </div>
     </div>
-
-    <div id="e-win" class="win" style="top: 100px; left: 100px; width: 450px;"><div class="hdr"><span>📁 Explorer</span><button class="close-btn" onclick="closeWin('e-win')">X</button></div><div class="content"><div style="padding:10px; background:#f0f0f0;"><button onclick="createNewFile()">+ New File</button></div><div id="explorer-view" style="overflow-y:auto; color:black; height:100%;"></div></div></div>
 </div>
 
 <div id="panel">
     <button class="p-btn" style="background:#2ecc71" onclick="openWin('t-win')">Terminal</button>
     <button class="p-btn" onclick="openWin('e-win')">Files</button>
     <button class="p-btn" onclick="openWin('b-win')">Browser</button>
-    <button class="p-btn" onclick="openWin('s-win')">Settings</button>
     <div id="clock">00:00:00</div>
 </div>
 
 <script>
     let highestZ = 1000;
-    let virtualFS = { "readme.txt": "Terminal: Try 'echo hello', 'mkdir project', or 'pwd'." };
-    let lastCode = "";
+    // Essential Mint recovery file included
+    let virtualFS = { 
+        "readme.txt": "Terminal: ls, touch, rm, cat, neofetch, clear. Open .os files to inject system code.",
+        "mint.os": document.documentElement.outerHTML 
+    };
 
     function openWin(id) {
         const win = document.getElementById(id);
@@ -89,28 +117,22 @@
 
     setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString(); }, 1000);
 
+    // BROWSER (Uses CORS proxy bypass)
     function navBrowser() {
         let val = document.getElementById('url-input').value;
-        let url = val.includes('.') ? (val.startsWith('http') ? val : 'https://' + val) : 'https://google.com' + encodeURIComponent(val) + '&igu=1';
-        document.getElementById('browser-frame').src = url;
+        if(!val) return;
+        if(!val.includes('.')) val = "https://duckduckgo.com" + encodeURIComponent(val);
+        else if(!val.startsWith('http')) val = "https://" + val;
+        // Bypassing X-Frame-Options: DENY with a viewing proxy
+        document.getElementById('browser-frame').src = "https://hypothes.is" + val;
     }
 
-    async function checkUpdates() {
-        const url = document.getElementById('gh-url').value;
-        if (!url) return;
-        try {
-            const response = await fetch(url + '?t=' + Date.now());
-            const code = await response.text();
-            if (lastCode && code !== lastCode) { document.open(); document.write(code); document.close(); }
-            lastCode = code;
-        } catch (e) { console.error("Update check failed."); }
+    function applyBg() {
+        const url = document.getElementById('bg-url-input').value;
+        document.body.style.backgroundImage = `url('${url}')`;
     }
 
-    function startAutoUpdate() {
-        alert("GitHub Sync Started!");
-        setInterval(checkUpdates, 30000);
-    }
-
+    // TERMINAL
     const tin = document.getElementById('term-in');
     const thist = document.getElementById('term-hist');
     tin.addEventListener('keydown', (e) => {
@@ -119,13 +141,15 @@
             const args = input.split(' ');
             const cmd = args[0].toLowerCase();
             thist.innerHTML += `\nmint@web:~$ ${input}`;
+
             if(cmd === 'ls') thist.innerHTML += `\n${Object.keys(virtualFS).join('  ')}`;
-            else if(cmd === 'echo') thist.innerHTML += `\n${args.slice(1).join(' ')}`;
-            else if(cmd === 'pwd') thist.innerHTML += `\n/home/mint/desktop`;
-            else if(cmd === 'mkdir') { virtualFS[args[1] + "/"] = ""; loadExplorer(); thist.innerHTML += `\nCreated folder: ${args[1]}`; }
-            else if(cmd === 'neofetch') thist.innerHTML += `\n<b>Web Mint 18.0</b>\nBrowser: Proxy-Enabled\nUpdate: GitHub-Sync`;
+            else if(cmd === 'touch' && args[1]) { virtualFS[args[1]] = ""; thist.innerHTML += `\nCreated ${args[1]}`; loadExplorer(); }
+            else if(cmd === 'rm' && args[1]) { delete virtualFS[args[1]]; thist.innerHTML += `\nDeleted ${args[1]}`; loadExplorer(); }
+            else if(cmd === 'cat' && args[1]) thist.innerHTML += `\n${virtualFS[args[1]] || "No such file."}`;
+            else if(cmd === 'neofetch') thist.innerHTML += `\n<b>Web Mint 19.0</b>\nKernel: Proxy-Injection-Core\nShell: MintBash`;
             else if(cmd === 'clear') thist.innerHTML = "Terminal cleared.";
             else if(input !== "") thist.innerHTML += `\nCommand not found.`;
+
             tin.value = "";
             thist.scrollTop = 9999;
         }
@@ -136,14 +160,40 @@
         view.innerHTML = "";
         for (let f in virtualFS) {
             const item = document.createElement('div');
-            item.style = "padding:12px; cursor:pointer; border-bottom:1px solid #ddd;";
-            item.innerHTML = `📄 ${f}`;
+            item.className = 'file-item';
+            item.innerHTML = (f.endsWith('.os') || f.endsWith('.html')) ? `💿 ${f}` : `📄 ${f}`;
+            item.onclick = () => openFile(f);
             view.appendChild(item);
         }
     }
+
     function createNewFile() {
-        const n = prompt("Name:");
+        const n = prompt("Filename (use .html or .os for system code):");
         if(n) { virtualFS[n] = ""; loadExplorer(); }
+    }
+
+    function openFile(n) {
+        document.getElementById('note-title').innerText = n;
+        document.getElementById('editor-area').value = virtualFS[n];
+        // Injector button visibility logic
+        document.getElementById('inject-btn').style.display = (n.endsWith('.os') || n.endsWith('.html')) ? 'block' : 'none';
+        openWin('n-win');
+    }
+
+    function saveFile() {
+        const name = document.getElementById('note-title').innerText;
+        virtualFS[name] = document.getElementById('editor-area').value;
+        alert("Saved.");
+    }
+
+    // SYSTEM INJECTOR
+    function injectOS() {
+        const code = document.getElementById('editor-area').value;
+        if(confirm("Warning: Applying this file will overwrite the current OS. Use mint.os to revert. Proceed?")) {
+            document.open();
+            document.write(code);
+            document.close();
+        }
     }
 
     document.querySelectorAll('.win').forEach(win => {
