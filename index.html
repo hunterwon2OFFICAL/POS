@@ -2,7 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Web Mint OS v19.0</title>
+    <title>Web Mint OS v20.0</title>
+    <!-- Bypasses X-Frame-Options to fix the "Refused to Connect" error -->
+    <script type="module" src="https://unpkg.com/x-frame-bypass"></script>
     <style>
         * { box-sizing: border-box; }
         body { 
@@ -13,7 +15,7 @@
         #panel { position: fixed; bottom: 0; width: 100%; height: 45px; background: #23272e; display: flex; align-items: center; padding: 0 10px; border-top: 1px solid #444; z-index: 10000; }
         .p-btn { background: #4ea84e; color: white; border: none; padding: 6px 12px; cursor: pointer; margin-right: 8px; border-radius: 4px; font-weight: bold; }
         #clock { margin-left: auto; font-family: monospace; color: #aaa; }
-        .win { position: absolute; width: 700px; height: 500px; background: #383c4a; display: none; flex-direction: column; border-radius: 6px; box-shadow: 0 15px 40px rgba(0,0,0,0.8); border: 1px solid #555; overflow: hidden;}
+        .win { position: absolute; width: 750px; height: 500px; background: #383c4a; display: none; flex-direction: column; border-radius: 6px; box-shadow: 0 15px 40px rgba(0,0,0,0.8); border: 1px solid #555; overflow: hidden;}
         .hdr { background: #23272e; padding: 10px; display: flex; justify-content: space-between; align-items: center; cursor: grab; user-select: none; }
         .content { flex-grow: 1; display: flex; flex-direction: column; overflow: hidden; background: #fff; color: #000;}
         .close-btn { background: #e74c3c; color: white; border: none; border-radius: 3px; cursor: pointer; padding: 2px 8px; }
@@ -35,29 +37,29 @@
         .icon span { font-size: 32px; display: block; margin-bottom: 5px; }
     </style>
 </head>
-<body id="os-root">
+<body>
 
 <div id="desktop">
     <div class="icon" style="top: 20px; left: 20px;" onclick="openWin('t-win')"><span>🖥️</span>Terminal</div>
     <div class="icon" style="top: 130px; left: 20px;" onclick="openWin('e-win')"><span>📁</span>Files</div>
     <div class="icon" style="top: 240px; left: 20px;" onclick="openWin('b-win')"><span>🌐</span>Browser</div>
-    <div class="icon" style="top: 350px; left: 20px;" onclick="openWin('s-win')"><span>⚙️</span>Settings</div>
 
     <!-- TERMINAL -->
     <div id="t-win" class="win" style="top: 50px; left: 150px; width: 650px; height: 400px;">
         <div class="hdr"><span>🖥️ Terminal</span><button class="close-btn" onclick="closeWin('t-win')">X</button></div>
-        <div class="content" style="background:#000;"><div id="term-box" onclick="document.getElementById('term-in').focus()"><div id="term-hist">Web-Mint v19.0. Type 'help'.</div><div style="display:flex"><span>mint@web:~$ &nbsp;</span><input type="text" id="term-in" spellcheck="false" autocomplete="off"></div></div></div>
+        <div class="content" style="background:#000;"><div id="term-box" onclick="document.getElementById('term-in').focus()"><div id="term-hist">Web-Mint Terminal. Try 'ls'.</div><div style="display:flex"><span>mint@web:~$ &nbsp;</span><input type="text" id="term-in" spellcheck="false" autocomplete="off"></div></div></div>
     </div>
 
-    <!-- BROWSER (Fixed Proxy) -->
+    <!-- BROWSER (Using x-frame-bypass to stop "Refused to Connect") -->
     <div id="b-win" class="win" style="top: 80px; left: 300px; width: 900px; height: 600px;">
-        <div class="hdr"><span>🌐 Browser (Enhanced Proxy)</span><button class="close-btn" onclick="closeWin('b-win')">X</button></div>
+        <div class="hdr"><span>🌐 Browser (Unblocked)</span><button class="close-btn" onclick="closeWin('b-win')">X</button></div>
         <div class="content">
             <div class="browser-bar">
-                <input type="text" id="url-input" placeholder="Enter URL (e.g., google.com)">
+                <input type="text" id="url-input" placeholder="Enter URL (e.g., wikipedia.org)">
                 <button onclick="navBrowser()">Go</button>
             </div>
-            <iframe id="browser-frame" src="https://hypothes.is"></iframe>
+            <!-- Bypasses security blocks -->
+            <iframe id="browser-frame" is="x-frame-bypass" src="https://wikipedia.org"></iframe>
         </div>
     </div>
 
@@ -70,7 +72,7 @@
         </div>
     </div>
 
-    <!-- NOTEPAD (OS Injector) -->
+    <!-- NOTEPAD -->
     <div id="n-win" class="win" style="top: 120px; left: 450px; width: 500px; height: 400px;">
         <div class="hdr"><span id="note-title">📄 Notepad</span><button class="close-btn" onclick="closeWin('n-win')">X</button></div>
         <div class="content">
@@ -79,15 +81,6 @@
                 <button id="inject-btn" style="background:#2196F3; color:white; border:none; padding:5px 10px; display:none;" onclick="injectOS()">🚀 Run System File</button>
                 <button onclick="saveFile()">💾 Save</button>
             </div>
-        </div>
-    </div>
-
-    <!-- SETTINGS -->
-    <div id="s-win" class="win" style="top: 150px; left: 400px; width: 450px; height: 350px;">
-        <div class="hdr"><span>⚙️ Settings</span><button class="close-btn" onclick="closeWin('s-win')">X</button></div>
-        <div class="content">
-            <div style="padding:15px; border-bottom:1px solid #eee; color:black;">Background: <input type="text" id="bg-url-input"><button onclick="applyBg()">Apply</button></div>
-            <div style="padding:15px; border-bottom:1px solid #eee; color:black;">GitHub Sync: <input type="text" id="gh-sync-input"><button onclick="startSync()">Sync</button></div>
         </div>
     </div>
 </div>
@@ -101,9 +94,9 @@
 
 <script>
     let highestZ = 1000;
-    // Essential Mint recovery file included
+    // mint.os contains the factory code to switch back
     let virtualFS = { 
-        "readme.txt": "Terminal: ls, touch, rm, cat, neofetch, clear. Open .os files to inject system code.",
+        "readme.txt": "Welcome to v20.0! Browser is fixed.",
         "mint.os": document.documentElement.outerHTML 
     };
 
@@ -117,19 +110,11 @@
 
     setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString(); }, 1000);
 
-    // BROWSER (Uses CORS proxy bypass)
     function navBrowser() {
         let val = document.getElementById('url-input').value;
         if(!val) return;
-        if(!val.includes('.')) val = "https://duckduckgo.com" + encodeURIComponent(val);
-        else if(!val.startsWith('http')) val = "https://" + val;
-        // Bypassing X-Frame-Options: DENY with a viewing proxy
-        document.getElementById('browser-frame').src = "https://hypothes.is" + val;
-    }
-
-    function applyBg() {
-        const url = document.getElementById('bg-url-input').value;
-        document.body.style.backgroundImage = `url('${url}')`;
+        if(!val.startsWith('http')) val = "https://" + val;
+        document.getElementById('browser-frame').src = val;
     }
 
     // TERMINAL
@@ -138,17 +123,13 @@
     tin.addEventListener('keydown', (e) => {
         if(e.key === 'Enter') {
             const input = tin.value.trim();
-            const args = input.split(' ');
-            const cmd = args[0].toLowerCase();
+            const cmd = input.split(' ')[0].toLowerCase();
             thist.innerHTML += `\nmint@web:~$ ${input}`;
 
             if(cmd === 'ls') thist.innerHTML += `\n${Object.keys(virtualFS).join('  ')}`;
-            else if(cmd === 'touch' && args[1]) { virtualFS[args[1]] = ""; thist.innerHTML += `\nCreated ${args[1]}`; loadExplorer(); }
-            else if(cmd === 'rm' && args[1]) { delete virtualFS[args[1]]; thist.innerHTML += `\nDeleted ${args[1]}`; loadExplorer(); }
-            else if(cmd === 'cat' && args[1]) thist.innerHTML += `\n${virtualFS[args[1]] || "No such file."}`;
-            else if(cmd === 'neofetch') thist.innerHTML += `\n<b>Web Mint 19.0</b>\nKernel: Proxy-Injection-Core\nShell: MintBash`;
             else if(cmd === 'clear') thist.innerHTML = "Terminal cleared.";
-            else if(input !== "") thist.innerHTML += `\nCommand not found.`;
+            else if(cmd === 'neofetch') thist.innerHTML += `\n<b>Web Mint 20.0</b>\nKernel: x-frame-bypass\nShell: MintBash`;
+            else if(input !== "") thist.innerHTML += `\n'${cmd}' not recognized.`;
 
             tin.value = "";
             thist.scrollTop = 9999;
@@ -168,14 +149,13 @@
     }
 
     function createNewFile() {
-        const n = prompt("Filename (use .html or .os for system code):");
+        const n = prompt("Filename (.html or .os for system code):");
         if(n) { virtualFS[n] = ""; loadExplorer(); }
     }
 
     function openFile(n) {
         document.getElementById('note-title').innerText = n;
         document.getElementById('editor-area').value = virtualFS[n];
-        // Injector button visibility logic
         document.getElementById('inject-btn').style.display = (n.endsWith('.os') || n.endsWith('.html')) ? 'block' : 'none';
         openWin('n-win');
     }
@@ -186,13 +166,10 @@
         alert("Saved.");
     }
 
-    // SYSTEM INJECTOR
     function injectOS() {
         const code = document.getElementById('editor-area').value;
-        if(confirm("Warning: Applying this file will overwrite the current OS. Use mint.os to revert. Proceed?")) {
-            document.open();
-            document.write(code);
-            document.close();
+        if(confirm("This will overwrite the current OS. Use mint.os to revert. Proceed?")) {
+            document.open(); document.write(code); document.close();
         }
     }
 
