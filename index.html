@@ -5,152 +5,101 @@
     <title>Web Mint - Cinnamon Edition</title>
     <style>
         body { 
-            background: #2f343f; 
-            color: white; 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            margin: 0; 
-            padding: 0; 
-            overflow: hidden; 
-            height: 100vh;
-            background-image: radial-gradient(#444 1px, transparent 1px);
-            background-size: 20px 20px;
+            background: #2f343f; color: white; font-family: 'Segoe UI', sans-serif; 
+            margin: 0; padding: 0; overflow: hidden; height: 100vh;
+            background-image: radial-gradient(#444 1px, transparent 1px); background-size: 20px 20px;
         }
 
-        /* Desktop Area */
         #desktop { width: 100%; height: calc(100vh - 45px); position: relative; }
 
-        /* Taskbar / Panel */
+        /* Taskbar */
         #panel { 
-            position: fixed; 
-            bottom: 0; 
-            width: 100%; 
-            height: 45px; 
-            background: #23272e; 
-            display: flex; 
-            align-items: center; 
-            padding: 0 10px; 
-            border-top: 1px solid #444; 
-            z-index: 9999; 
+            position: fixed; bottom: 0; width: 100%; height: 45px; 
+            background: #23272e; display: flex; align-items: center; 
+            padding: 0 10px; border-top: 1px solid #444; z-index: 9999; 
         }
 
         .p-btn { 
-            background: #4ea84e; 
-            color: white; 
-            border: none; 
-            padding: 6px 12px; 
-            cursor: pointer; 
-            margin-right: 8px; 
-            border-radius: 4px; 
-            font-weight: bold; 
-            transition: 0.2s;
+            background: #4ea84e; color: white; border: none; padding: 6px 12px; 
+            cursor: pointer; margin-right: 8px; border-radius: 4px; font-weight: bold; 
         }
-        .p-btn:hover { background: #5cb85c; }
 
         /* Window Styling */
         .win { 
-            position: absolute; 
-            width: 500px; 
-            min-height: 350px; 
-            background: #383c4a; 
-            display: none; 
-            flex-direction: column; 
-            border-radius: 6px; 
-            box-shadow: 0 15px 40px rgba(0,0,0,0.5); 
-            border: 1px solid #555; 
+            position: absolute; width: 600px; height: 400px; 
+            background: #383c4a; display: none; flex-direction: column; 
+            border-radius: 6px; box-shadow: 0 15px 40px rgba(0,0,0,0.5); border: 1px solid #555; 
         }
 
         .hdr { 
-            background: #23272e; 
-            padding: 10px 15px; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center;
-            border-radius: 6px 6px 0 0; 
-            cursor: grab; 
-            user-select: none; 
-        }
-        .hdr:active { cursor: grabbing; }
-
-        .content { flex-grow: 1; display: flex; flex-direction: column; overflow: hidden; }
-
-        .close-btn { 
-            background: #e74c3c; 
-            color: white; 
-            border: none; 
-            border-radius: 3px; 
-            cursor: pointer; 
-            padding: 2px 10px; 
-            font-weight: bold;
+            background: #23272e; padding: 10px 15px; display: flex; 
+            justify-content: space-between; align-items: center;
+            border-radius: 6px 6px 0 0; cursor: grab; user-select: none; 
         }
 
-        /* Interactive Terminal */
-        #term-out { 
-            background: #000; 
-            color: #4af626; 
-            font-family: 'Consolas', 'Monaco', monospace; 
-            padding: 15px; 
-            outline: none; 
-            border: none; 
-            width: 100%; 
-            height: 100%;
-            box-sizing: border-box; 
-            resize: none;
-            font-size: 14px;
-        }
+        .content { flex-grow: 1; display: flex; flex-direction: column; overflow: hidden; background: #fff; color: #000;}
+        .close-btn { background: #e74c3c; color: white; border: none; border-radius: 3px; cursor: pointer; padding: 2px 10px; }
 
-        /* Explorer Styling */
-        #explorer-content { background: #fff; color: #333; height: 100%; padding: 0; }
-        .file-list { list-style: none; padding: 10px; margin: 0; }
-        .file-item { 
-            padding: 8px; 
-            cursor: pointer; 
-            border-radius: 4px; 
-            display: flex; 
-            align-items: center; 
-            gap: 10px;
-        }
-        .file-item:hover { background: #e8f5e9; color: #2e7d32; }
+        /* Terminal Fixed */
+        #term-container { background: #000; color: #4af626; height: 100%; font-family: monospace; padding: 10px; overflow-y: auto; }
+        #term-input { background: transparent; color: #4af626; border: none; outline: none; width: 80%; font-family: monospace; font-size: 14px; }
 
+        /* Browser Styling */
+        .browser-bar { background: #eee; padding: 5px; display: flex; gap: 5px; border-bottom: 1px solid #ccc; }
+        .browser-bar input { flex-grow: 1; padding: 4px; border: 1px solid #ccc; border-radius: 3px; }
+        iframe { width: 100%; height: 100%; border: none; background: white; }
+
+        /* Explorer */
+        .file-item { padding: 8px; cursor: pointer; display: flex; align-items: center; gap: 10px; }
+        .file-item:hover { background: #e8f5e9; }
     </style>
 </head>
 <body>
 
 <div id="desktop">
-    <div style="padding: 50px; text-align: center; opacity: 0.5;">
-        <h1>Linux Mint Web</h1>
-        <p>Frontend Simulation v1.0</p>
+    <!-- Terminal Window -->
+    <div id="t-win" class="win" style="top: 30px; left: 30px;">
+        <div class="hdr"><span>🖥️ Terminal</span><button class="close-btn" onclick="closeWin('t-win')">X</button></div>
+        <div class="content" style="background: #000;">
+            <div id="term-container" onclick="document.getElementById('term-input').focus()">
+                <div id="term-history">Welcome to Web-Mint Terminal<br>Type 'help' for commands.</div>
+                <span>mint@web:~$ </span><input type="text" id="term-input" autofocus spellcheck="false">
+            </div>
+        </div>
     </div>
 
-    <!-- Terminal Window -->
-    <div id="t-win" class="win" style="top: 50px; left: 50px;">
-        <div class="hdr"><span>🖥️ Terminal</span><button class="close-btn" onclick="closeWin('t-win')">X</button></div>
+    <!-- Browser Window -->
+    <div id="b-win" class="win" style="top: 80px; left: 300px; width: 800px; height: 500px;">
+        <div class="hdr"><span>🌐 Web Browser</span><button class="close-btn" onclick="closeWin('b-win')">X</button></div>
         <div class="content">
-            <textarea id="term-out" spellcheck="false">Welcome to Web-Mint 2026&#10;mint@web:~$ </textarea>
+            <div class="browser-bar">
+                <input type="text" id="browser-url" value="https://bing.com">
+                <button onclick="goUrl()">Go</button>
+            </div>
+            <iframe id="browser-frame" src="https://bing.com"></iframe>
         </div>
     </div>
 
     <!-- Explorer Window -->
-    <div id="e-win" class="win" style="top: 100px; left: 400px;">
-        <div class="hdr"><span>📁 File Explorer</span><button class="close-btn" onclick="closeWin('e-win')">X</button></div>
-        <div class="content" id="explorer-content">
-            <ul class="file-list">
-                <li class="file-item" onclick="termInput('cd Documents')">📁 Documents</li>
-                <li class="file-item" onclick="termInput('cd Downloads')">📁 Downloads</li>
-                <li class="file-item" onclick="alert('Mint Web OS - Cinnamon Frontend\nBuilt with HTML/CSS/JS')">📄 readme.txt</li>
-                <li class="file-item" onclick="alert('System is healthy.')">⚙️ system.cfg</li>
-            </ul>
+    <div id="e-win" class="win" style="top: 150px; left: 100px;">
+        <div class="hdr"><span>📁 Explorer</span><button class="close-btn" onclick="closeWin('e-win')">X</button></div>
+        <div class="content">
+            <div class="file-item" onclick="alert('Opening Documents...')">📁 Documents</div>
+            <div class="file-item" onclick="alert('Downloads empty')">📁 Downloads</div>
+            <div class="file-item" onclick="openWin('b-win')">🌐 Web Browser.desktop</div>
         </div>
     </div>
 </div>
 
-<!-- Taskbar -->
 <div id="panel">
+    <button class="p-btn" style="background:#2ecc71" onclick="alert('Menu coming soon!')">LM</button>
     <button class="p-btn" onclick="openWin('t-win')">Terminal</button>
     <button class="p-btn" onclick="openWin('e-win')">Files</button>
+    <button class="p-btn" onclick="openWin('b-win')">Browser</button>
 </div>
 
 <script>
-    let highestZ = 10;
+    let highestZ = 100;
 
     function openWin(id) {
         const win = document.getElementById(id);
@@ -158,63 +107,66 @@
         focusWin(win);
     }
 
-    function closeWin(id) {
-        document.getElementById(id).style.display = 'none';
-    }
+    function closeWin(id) { document.getElementById(id).style.display = 'none'; }
 
     function focusWin(win) {
         highestZ++;
         win.style.zIndex = highestZ;
     }
 
-    // Interactive Terminal Helper
-    function termInput(cmd) {
-        const term = document.getElementById('term-out');
-        term.value += cmd + "\nMoving to directory...\nmint@web:~$ ";
-        term.scrollTop = term.scrollHeight;
-        openWin('t-win');
-    }
+    // Terminal Logic
+    const termInput = document.getElementById('term-input');
+    const termHistory = document.getElementById('term-history');
 
-    // Terminal Keyboard Logic
-    document.getElementById('term-out').addEventListener('keydown', function(e) {
+    termInput.addEventListener('keydown', function(e) {
         if (e.key === 'Enter') {
-            e.preventDefault();
-            const lines = this.value.split('\n');
-            const lastLine = lines[lines.length - 1].replace('mint@web:~$ ', '');
+            const cmd = this.value.trim().toLowerCase();
+            termHistory.innerHTML += `<div>mint@web:~$ ${this.value}</div>`;
             
-            this.value += "\nRunning: " + (lastLine || "empty") + "...\nmint@web:~$ ";
-            this.scrollTop = this.scrollHeight;
+            if (cmd === 'help') {
+                termHistory.innerHTML += "<div>Available: help, clear, exit, browser, ls</div>";
+            } else if (cmd === 'clear') {
+                termHistory.innerHTML = "";
+            } else if (cmd === 'ls') {
+                termHistory.innerHTML += "<div>Documents  Downloads  readme.txt</div>";
+            } else if (cmd === 'browser') {
+                openWin('b-win');
+                termHistory.innerHTML += "<div>Opening Browser...</div>";
+            } else {
+                termHistory.innerHTML += `<div>Command '${cmd}' not found.</div>`;
+            }
+            
+            this.value = "";
+            document.getElementById('term-container').scrollTop = 9999;
         }
     });
 
-    // DRAGGING ENGINE
+    // Browser Logic
+    function goUrl() {
+        const url = document.getElementById('browser-url').value;
+        document.getElementById('browser-frame').src = url;
+    }
+
+    // Dragging Logic
     document.querySelectorAll('.win').forEach(win => {
         const header = win.querySelector('.hdr');
-        let x = 0, y = 0, mouseX = 0, mouseY = 0;
-
         header.onmousedown = function(e) {
-            e.preventDefault();
             focusWin(win);
-            mouseX = e.clientX;
-            mouseY = e.clientY;
-            
-            document.onmousemove = function(e) {
-                e.preventDefault();
-                x = mouseX - e.clientX;
-                y = mouseY - e.clientY;
-                mouseX = e.clientX;
-                mouseY = e.clientY;
-                win.style.top = (win.offsetTop - y) + "px";
-                win.style.left = (win.offsetLeft - x) + "px";
-            };
+            let shiftX = e.clientX - win.getBoundingClientRect().left;
+            let shiftY = e.clientY - win.getBoundingClientRect().top;
 
+            function moveAt(pageX, pageY) {
+                win.style.left = pageX - shiftX + 'px';
+                win.style.top = pageY - shiftY + 'px';
+            }
+
+            function onMouseMove(e) { moveAt(e.pageX, e.pageY); }
+            document.addEventListener('mousemove', onMouseMove);
             document.onmouseup = function() {
-                document.onmousemove = null;
+                document.removeEventListener('mousemove', onMouseMove);
                 document.onmouseup = null;
             };
         };
-
-        // Focus on click anywhere in window
         win.onmousedown = () => focusWin(win);
     });
 </script>
