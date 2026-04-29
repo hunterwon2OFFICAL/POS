@@ -1,53 +1,147 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Web Mint - Cinnamon</title>
+    <title>Linux Mint Cinnamon Web OS</title>
     <style>
-        body { background: #2f343f; color: white; font-family: sans-serif; margin: 0; padding: 0; }
-        #panel { position: fixed; bottom: 0; width: 100%; height: 45px; background: #23272e; display: flex; align-items: center; padding: 0 15px; border-top: 1px solid #444; }
-        .p-btn { background: #4ea84e; color: white; border: none; padding: 8px 15px; cursor: pointer; margin-right: 10px; border-radius: 4px; font-weight: bold; }
+        body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; font-family: 'Segoe UI', sans-serif; background: #2f343f; color: white; }
+        #desktop { height: calc(100vh - 45px); position: relative; padding: 20px; }
         
-        /* The Windows */
-        .win { position: absolute; top: 10%; left: 10%; width: 450px; height: 300px; background: #383c4a; border: 1px solid #555; display: none; flex-direction: column; border-radius: 8px; box-shadow: 0 10px 30px black; }
-        .hdr { background: #23272e; padding: 10px; display: flex; justify-content: space-between; border-radius: 8px 8px 0 0; }
-        .content { padding: 20px; flex-grow: 1; }
+        /* Panel */
+        #panel { height: 45px; background: #23272e; position: fixed; bottom: 0; width: 100%; display: flex; align-items: center; padding: 0 10px; border-top: 1px solid #444; z-index: 1000; }
+        .panel-btn { background: #4ea84e; border: none; padding: 8px 15px; color: white; border-radius: 4px; cursor: pointer; margin-right: 10px; font-weight: bold; }
+        .app-btn { background: #383c4a; }
+
+        /* Draggable Window */
+        .window { position: absolute; width: 500px; height: 350px; background: #383c4a; border: 1px solid #555; display: none; flex-direction: column; border-radius: 8px 8px 0 0; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 100; }
+        .window-header { background: #23272e; padding: 10px; display: flex; justify-content: space-between; align-items: center; border-radius: 8px 8px 0 0; cursor: move; user-select: none; }
+        .close-btn { background: #e74c3c; border: none; color: white; border-radius: 50%; width: 20px; height: 20px; cursor: pointer; }
+
+        /* App Contents */
+        .content { flex-grow: 1; overflow: auto; display: flex; flex-direction: column; }
         
-        /* Desktop text */
-        #msg { padding: 50px; text-align: center; font-size: 20px; }
+        /* Terminal */
+        #term-body { background: black; color: #0f0; font-family: monospace; padding: 15px; flex-grow: 1; overflow-y: auto; white-space: pre-wrap; }
+        #term-input { background: transparent; border: none; color: #0f0; outline: none; width: 80%; font-family: monospace; font-size: 14px; }
+
+        /* Explorer */
+        #expl-body { background: white; color: #333; display: flex; flex-grow: 1; }
+        .sidebar { width: 120px; background: #ddd; padding: 10px; border-right: 1px solid #ccc; }
+        .sidebar div { padding: 5px; cursor: pointer; font-size: 14px; border-radius: 3px; }
+        .sidebar div:hover { background: #bbb; }
+        .file-grid { flex-grow: 1; padding: 15px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .file-item { text-align: center; font-size: 12px; }
     </style>
 </head>
 <body>
 
-    <div id="msg">
-        <h1>Linux Mint Web OS</h1>
-        <p>If you see the buttons at the bottom, click them!</p>
-    </div>
+<div id="desktop"></div>
 
-    <!-- Taskbar -->
-    <div id="panel">
-        <button class="p-btn" onclick="document.getElementById('t-win').style.display='flex'">🖥️ Terminal</button>
-        <button class="p-btn" onclick="document.getElementById('e-win').style.display='flex'">📁 Explorer</button>
-    </div>
+<div id="panel">
+    <button class="panel-btn">LM</button>
+    <button class="panel-btn app-btn" onclick="openApp('terminal-win')">🖥️ Terminal</button>
+    <button class="panel-btn app-btn" onclick="openApp('explorer-win')">📁 Explorer</button>
+</div>
 
-    <!-- Terminal -->
-    <div id="t-win" class="win">
-        <div class="hdr"><span>Terminal</span><button onclick="this.parentElement.parentElement.style.display='none'">X</button></div>
-        <div class="content" style="background:black; color:lime; font-family:monospace;">
-            Welcome. Terminal is running!<br><br>
-            mint@web:~$ _
+<!-- TERMINAL -->
+<div id="terminal-win" class="window" style="top: 50px; left: 50px;">
+    <div class="window-header" onmousedown="startDrag(event, 'terminal-win')">
+        <span>Terminal</span>
+        <button class="close-btn" onclick="closeApp('terminal-win')">x</button>
+    </div>
+    <div class="content" style="background:black;" onclick="document.getElementById('term-input').focus()">
+        <div id="term-body">Welcome to Web Mint OS. Type 'help' to start.</div>
+        <div style="padding: 0 15px 15px 15px; background:black;">
+            <span>mint@web:~$ </span><input type="text" id="term-input" spellcheck="false">
         </div>
     </div>
+</div>
 
-    <!-- Explorer -->
-    <div id="e-win" class="win">
-        <div class="hdr"><span>File Explorer</span><button onclick="this.parentElement.parentElement.style.display='none'">X</button></div>
-        <div class="content" style="background:white; color:black;">
-            <b>Home Folder</b><br><hr>
-            📁 Documents<br>
-            📁 Downloads<br>
-            📄 readme.txt
-        </div>
+<!-- EXPLORER -->
+<div id="explorer-win" class="window" style="top: 100px; left: 100px;">
+    <div class="window-header" onmousedown="startDrag(event, 'explorer-win')">
+        <span>File Explorer</span>
+        <button class="close-btn" onclick="closeApp('explorer-win')">x</button>
     </div>
+    <div id="expl-body">
+        <div class="sidebar">
+            <div onclick="showFiles('Home')">🏠 Home</div>
+            <div onclick="showFiles('Docs')">📂 Documents</div>
+        </div>
+        <div class="file-grid" id="file-view"></div>
+    </div>
+</div>
+
+<script>
+    // --- DRAGGING LOGIC ---
+    let activeWin = null;
+    let startX, startY;
+
+    function startDrag(e, id) {
+        activeWin = document.getElementById(id);
+        startX = e.clientX - activeWin.offsetLeft;
+        startY = e.clientY - activeWin.offsetTop;
+        // Bring to front
+        document.querySelectorAll('.window').forEach(w => w.style.zIndex = 100);
+        activeWin.style.zIndex = 200;
+    }
+
+    window.onmousemove = function(e) {
+        if (activeWin) {
+            activeWin.style.left = (e.clientX - startX) + 'px';
+            activeWin.style.top = (e.clientY - startY) + 'px';
+        }
+    };
+
+    window.onmouseup = function() { activeWin = null; };
+
+    // --- APP CONTROLS ---
+    function openApp(id) {
+        document.getElementById(id).style.display = 'flex';
+        if(id === 'terminal-win') document.getElementById('term-input').focus();
+        if(id === 'explorer-win') showFiles('Home');
+    }
+
+    function closeApp(id) { document.getElementById(id).style.display = 'none'; }
+
+    // --- TERMINAL COMMANDS ---
+    const termInput = document.getElementById('term-input');
+    const termBody = document.getElementById('term-body');
+
+    termInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            const cmd = termInput.value.toLowerCase().trim();
+            termBody.innerHTML += `\nmint@web:~$ ${termInput.value}`;
+            
+            if (cmd === 'help') termBody.innerHTML += `\nCommands: help, date, whoami, clear`;
+            else if (cmd === 'date') termBody.innerHTML += `\n${new Date().toLocaleString()}`;
+            else if (cmd === 'whoami') termBody.innerHTML += `\nmint-user`;
+            else if (cmd === 'clear') termBody.innerHTML = `Welcome to Web Mint OS. Type 'help' to start.`;
+            else if (cmd !== "") termBody.innerHTML += `\nCommand not found: ${cmd}`;
+            
+            termInput.value = '';
+            termBody.scrollTop = termBody.scrollHeight;
+        }
+    });
+
+    // --- FILE SYSTEM ---
+    const files = {
+        'Home': ['Documents', 'Downloads', 'mint.iso'],
+        'Docs': ['resume.pdf', 'notes.txt']
+    };
+
+    function showFiles(dir) {
+        const view = document.getElementById('file-view');
+        view.innerHTML = "";
+        (files[dir] || []).forEach(f => {
+            const isFile = f.includes('.');
+            view.innerHTML += `
+                <div class="file-item" onclick="${!isFile ? `showFiles('Docs')` : ''}">
+                    <div style="font-size:30px">${isFile ? '📄' : '📁'}</div>
+                    <span>${f}</span>
+                </div>`;
+        });
+    }
+</script>
 
 </body>
 </html>
