@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Web Mint OS v25.0 - Bulletproof Core</title>
+    <title>Web Mint OS v26.0</title>
     <style>
         * { box-sizing: border-box; }
         body { 
@@ -20,15 +20,18 @@
         .content { flex-grow: 1; display: flex; flex-direction: column; overflow: hidden; background: #fff; color: #000; position: relative; }
         .close-btn { background: #e74c3c; color: white; border: none; border-radius: 3px; cursor: pointer; padding: 2px 8px; }
 
-        #term-box { background: #000; color: #4af626; height: 100%; display: flex; flex-direction: column; padding: 10px; font-family: monospace; }
-        #term-hist { flex-grow: 1; overflow-y: auto; white-space: pre-wrap; font-size: 14px; }
+        /* Terminal Fixed */
+        #term-box { background: #000; color: #4af626; height: 100%; display: flex; flex-direction: column; padding: 12px; font-family: 'Consolas', monospace; }
+        #term-hist { flex-grow: 1; overflow-y: auto; white-space: pre-wrap; font-size: 14px; margin-bottom: 5px; }
+        .t-prompt { display: flex; align-items: center; }
         #term-in { background: transparent; color: #fff; border: none; outline: none; flex-grow: 1; font-family: inherit; font-size: 14px; }
 
-        .icon { position: absolute; width: 90px; text-align: center; cursor: pointer; padding: 10px; color: white; text-shadow: 1px 1px 4px black; }
-        .icon span { font-size: 32px; display: block; margin-bottom: 5px; }
-        
+        /* File Manager & Store */
         .file-item { padding: 12px; cursor: pointer; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #eee; }
         .file-item:hover { background: #e8f5e9; }
+        
+        .icon { position: absolute; width: 90px; text-align: center; cursor: pointer; padding: 10px; color: white; text-shadow: 1px 1px 4px black; }
+        .icon span { font-size: 32px; display: block; margin-bottom: 5px; }
     </style>
 </head>
 <body>
@@ -42,50 +45,54 @@
     <!-- TERMINAL -->
     <div id="t-win" class="win" style="top: 50px; left: 150px; width: 650px; height: 400px;">
         <div class="hdr"><span>🖥️ Terminal</span><button class="close-btn" onclick="closeWin('t-win')">X</button></div>
-        <div class="content" style="background:#000;"><div id="term-box" onclick="document.getElementById('term-in').focus()"><div id="term-hist">Web-Mint v25.0. Type 'help'.</div><div style="display:flex"><span>mint@web:~$ &nbsp;</span><input type="text" id="term-in" spellcheck="false" autocomplete="off"></div></div></div>
-    </div>
-
-    <!-- BROWSER (Stable Proxy) -->
-    <div id="b-win" class="win" style="top: 80px; left: 300px; width: 900px; height: 600px;">
-        <div class="hdr"><span>🌐 Browser</span><button class="close-btn" onclick="closeWin('b-win')">X</button></div>
-        <div class="content">
-            <div style="background:#eee; padding:8px; display:flex; gap:5px;"><input type="text" id="url-input" style="flex-grow:1" value="https://duckduckgo.com"><button onclick="navBrowser()">Go</button></div>
-            <iframe id="browser-frame" src="https://duckduckgo.com" style="width:100%; height:100%; border:none;"></iframe>
+        <div class="content" style="background:#000;">
+            <div id="term-box" onclick="document.getElementById('term-in').focus()">
+                <div id="term-hist">Web-Mint Terminal [v26.0]&#10;Type 'help' to see available commands.</div>
+                <div class="t-prompt"><span style="color:#4af626">mint@web:~$ &nbsp;</span><input type="text" id="term-in" spellcheck="false" autocomplete="off"></div>
+            </div>
         </div>
     </div>
 
-    <!-- SETTINGS (Hard-Coded) -->
-    <div id="s-win" class="win" style="top: 150px; left: 400px; width: 450px; height: 350px;">
-        <div class="hdr"><span>⚙️ Settings</span><button class="close-btn" onclick="closeWin('s-win')">X</button></div>
-        <div class="content" style="padding:20px; color:black;">
-            <b>System Recovery</b><br><br>
-            <button onclick="factoryReset()" style="background:#e74c3c; color:white; border:none; padding:10px; border-radius:4px; cursor:pointer; width:100%;">FACTORY RESET OS</button>
-            <br><br><b>Custom Wallpaper</b><br><input type="text" id="bg-input" style="width:100%; margin-top:5px;"><button onclick="document.body.style.backgroundImage = 'url('+document.getElementById('bg-input').value+')'" style="margin-top:5px; cursor:pointer;">Apply Wallpaper</button>
+    <!-- BROWSER (The "No-Block" Fix) -->
+    <div id="b-win" class="win" style="top: 80px; left: 300px; width: 600px; height: 350px;">
+        <div class="hdr"><span>🌐 Browser Launcher</span><button class="close-btn" onclick="closeWin('b-win')">X</button></div>
+        <div class="content" style="padding: 20px; text-align: center; color: #333;">
+            <h3>Web Browser</h3>
+            <p>To avoid "Refused to Connect" errors, this OS now launches sites in a secure new workspace.</p>
+            <input type="text" id="url-input" placeholder="Search or type URL..." style="width: 80%; padding: 10px; margin-bottom: 10px; border-radius: 4px; border: 1px solid #ccc;">
+            <br>
+            <button onclick="launchBrowser()" style="background: #4ea84e; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-weight: bold;">Launch Site</button>
         </div>
     </div>
 
-    <!-- EXPLORER -->
+    <!-- EXPLORER (Includes Store) -->
     <div id="e-win" class="win" style="top: 100px; left: 100px; width: 450px;">
         <div class="hdr"><span>📁 Explorer</span><button class="close-btn" onclick="closeWin('e-win')">X</button></div>
-        <div class="content"><div style="padding:10px; background:#f0f0f0;"><button onclick="createNewFile()">+ New File</button></div><div id="explorer-view" style="overflow-y:auto; color:black; height:100%;"></div></div>
+        <div class="content">
+            <div style="padding:10px; background:#f0f0f0; border-bottom: 1px solid #ccc;"><button onclick="createNewFile()">+ New File</button></div>
+            <div id="explorer-view" style="overflow-y:auto; color:black; height:100%;"></div>
+        </div>
     </div>
 
-    <!-- NOTEPAD (Sandbox Runner) -->
+    <!-- NOTEPAD -->
     <div id="n-win" class="win" style="top: 120px; left: 450px; width: 500px; height: 400px;">
         <div class="hdr"><span id="note-title">📄 Notepad</span><button class="close-btn" onclick="closeWin('n-win')">X</button></div>
         <div class="content">
             <textarea id="editor-area" style="width:100%; height:100%; border:none; padding:15px; outline:none; font-family:monospace;"></textarea>
             <div style="background:#ddd; padding:8px; display:flex; justify-content: space-between;">
-                <button onclick="runInSandbox()" style="background:#2196F3; color:white; border:none; padding:5px 12px; border-radius:4px; cursor:pointer;">🚀 RUN IN SANDBOX</button>
+                <button onclick="runApp()" style="background:#2196F3; color:white; border:none; padding:5px 12px; border-radius:4px; cursor:pointer;">🚀 Run System File</button>
                 <button onclick="saveFile()">💾 Save</button>
             </div>
         </div>
     </div>
 
-    <!-- SANDBOX WINDOW -->
-    <div id="sandbox-win" class="win" style="top: 200px; left: 200px; width: 600px; height: 450px;">
-        <div class="hdr"><span>🧪 App Sandbox</span><button class="close-btn" onclick="closeWin('sandbox-win')">X</button></div>
-        <div class="content"><iframe id="sandbox-frame" style="width:100%; height:100%; border:none;"></iframe></div>
+    <!-- SETTINGS (Recovery) -->
+    <div id="s-win" class="win" style="top: 150px; left: 400px; width: 450px; height: 350px;">
+        <div class="hdr"><span>⚙️ Settings</span><button class="close-btn" onclick="closeWin('s-win')">X</button></div>
+        <div class="content" style="padding:20px; color:black;">
+            <b>Emergency Actions</b><br><br>
+            <button onclick="factoryReset()" style="background:#e74c3c; color:white; border:none; padding:10px; border-radius:4px; cursor:pointer; width:100%;">FACTORY RESET OS</button>
+        </div>
     </div>
 </div>
 
@@ -98,8 +105,12 @@
 
 <script>
     let highestZ = 1000;
-    const ORIGINAL_HTML = document.documentElement.outerHTML;
-    let virtualFS = { "readme.txt": "Welcome to v25.0! Use sandbox to test code." };
+    const FACTORY_BACKUP = document.documentElement.outerHTML;
+    let virtualFS = { 
+        "readme.txt": "Welcome. Use 'help' in Terminal. Browser now uses Launcher mode.",
+        "Store/Clock_App.os": "<h1>12:00 PM</h1>",
+        "Store/Calculator.os": "<h1>Calculator</h1>"
+    };
 
     function openWin(id) {
         const win = document.getElementById(id);
@@ -110,14 +121,17 @@
     function closeWin(id) { document.getElementById(id).style.display = 'none'; }
     setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString(); }, 1000);
 
-    function navBrowser() {
+    // Browser Launcher (Fixed)
+    function launchBrowser() {
         let val = document.getElementById('url-input').value;
-        if(!val.startsWith('http')) val = "https://" + val;
-        document.getElementById('browser-frame').src = val;
+        if(!val) return;
+        let url = val.includes('.') ? (val.startsWith('http') ? val : 'https://' + val) : 'https://google.com' + encodeURIComponent(val);
+        window.open(url, '_blank', 'width=1000,height=700');
     }
 
-    function factoryReset() { if(confirm("This will wipe all changes. Proceed?")) { document.open(); document.write(ORIGINAL_HTML); document.close(); } }
+    function factoryReset() { if(confirm("Reset entire OS?")) { document.open(); document.write(FACTORY_BACKUP); document.close(); } }
 
+    // TERMINAL ENGINE
     const tin = document.getElementById('term-in');
     const thist = document.getElementById('term-hist');
     tin.addEventListener('keydown', (e) => {
@@ -125,40 +139,45 @@
             const input = tin.value.trim();
             const cmd = input.toLowerCase();
             thist.innerHTML += `\nmint@web:~$ ${input}`;
-            if(cmd === 'help') thist.innerHTML += `\nCommands: ls, clear, help, neofetch`;
-            else if(cmd === 'ls') thist.innerHTML += `\n${Object.keys(virtualFS).join('  ')}`;
-            else if(cmd === 'neofetch') thist.innerHTML += `\n<b>Web Mint 25.0</b>\nKernel: Sandbox-Core\nShell: Bash-Emu`;
-            else if(cmd === 'clear') thist.innerHTML = "Terminal cleared.";
-            else if(input !== "") thist.innerHTML += `\nCommand not found.`;
+
+            if(cmd === 'help') {
+                thist.innerHTML += `\nCommands:\n- help: Show this list\n- ls: List files\n- neofetch: System Info\n- clear: Clear screen`;
+            } else if(cmd === 'ls') {
+                thist.innerHTML += `\n${Object.keys(virtualFS).join('  ')}`;
+            } else if(cmd === 'neofetch') {
+                thist.innerHTML += `\n<b>Web Mint 26.0</b>\nKernel: No-Block-Core\nShell: MintBash`;
+            } else if(cmd === 'clear') {
+                thist.innerHTML = "Terminal cleared.";
+            } else if(input !== "") {
+                thist.innerHTML += `\n'${cmd}' not found. Type 'help'.`;
+            }
+
             tin.value = "";
             thist.scrollTop = 9999;
         }
     });
 
+    // File Manager Logic
     function loadExplorer() {
         const view = document.getElementById('explorer-view');
         view.innerHTML = "";
         for (let f in virtualFS) {
             const item = document.createElement('div');
             item.className = 'file-item';
-            item.innerHTML = `📄 ${f}`;
+            item.innerHTML = f.includes('/') ? `🛍️ ${f}` : `📄 ${f}`;
             item.onclick = () => { document.getElementById('note-title').innerText = f; document.getElementById('editor-area').value = virtualFS[f]; openWin('n-win'); };
             view.appendChild(item);
         }
     }
     function createNewFile() { const n = prompt("Name:"); if(n) { virtualFS[n] = ""; loadExplorer(); } }
     function saveFile() { virtualFS[document.getElementById('note-title').innerText] = document.getElementById('editor-area').value; alert("Saved."); }
-
-    // SANDBOX EXECUTION (Fixed running issues)
-    function runInSandbox() {
+    
+    function runApp() {
         const code = document.getElementById('editor-area').value;
-        const frame = document.getElementById('sandbox-frame').contentWindow.document;
-        frame.open();
-        frame.write(code);
-        frame.close();
-        openWin('sandbox-win');
+        document.open(); document.write(code); document.close();
     }
 
+    // Drag Logic
     document.querySelectorAll('.win').forEach(win => {
         const h = win.querySelector('.hdr');
         h.onmousedown = (e) => {
@@ -168,6 +187,7 @@
             document.onmouseup = () => document.onmousemove = null;
         };
     });
+
     loadExplorer();
 </script>
 </body>
