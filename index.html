@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Web Mint OS v28.0 - FULL EDITION</title>
+    <title>Web Mint OS v28.0 - Recovery Edition</title>
     <style>
         * { box-sizing: border-box; }
         body { 
@@ -19,14 +19,15 @@
         .content { flex-grow: 1; display: flex; flex-direction: column; overflow: hidden; background: #fff; color: #000;}
         .close-btn { background: #e74c3c; color: white; border: none; border-radius: 3px; cursor: pointer; padding: 2px 8px; }
 
-        /* Terminal */
+        /* Terminal UI */
         #term-box { background: #000; color: #4af626; height: 100%; display: flex; flex-direction: column; padding: 12px; font-family: 'Consolas', monospace; }
+        #term-hist { flex-grow: 1; overflow-y: auto; white-space: pre-wrap; margin-bottom: 5px; }
         #term-in { background: transparent; color: #fff; border: none; outline: none; flex-grow: 1; font-family: inherit; font-size: 14px; }
 
-        /* Browser & Store */
-        .browser-bar, .store-header { background: #eee; padding: 10px; display: flex; gap: 8px; border-bottom: 1px solid #ccc; }
+        /* App Store */
         .store-item { padding: 15px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; color: black; }
         
+        /* Icons */
         .icon { position: absolute; width: 90px; text-align: center; cursor: pointer; padding: 10px; color: white; text-shadow: 1px 1px 4px black; }
         .icon span { font-size: 32px; display: block; margin-bottom: 5px; }
     </style>
@@ -39,41 +40,41 @@
     <div class="icon" style="top: 240px; left: 20px;" onclick="openWin('b-win')"><span>🌐</span>Browser</div>
     <div class="icon" style="top: 350px; left: 20px;" onclick="openWin('a-win')"><span>🛍️</span>Store</div>
 
-    <!-- TERMINAL -->
-    <div id="t-win" class="win" style="top: 40px; left: 160px; width: 600px; height: 380px;">
+    <!-- TERMINAL (RESTORED) -->
+    <div id="t-win" class="win" style="top: 50px; left: 150px; width: 600px; height: 400px;">
         <div class="hdr"><span>🖥️ Terminal</span><button class="close-btn" onclick="closeWin('t-win')">X</button></div>
         <div class="content" style="background:#000;">
             <div id="term-box" onclick="document.getElementById('term-in').focus()">
-                <div id="term-hist">Web-Mint v28.0 | Type 'help' for commands.</div>
-                <div style="display:flex"><span style="color:#4af626">mint@web:~$ &nbsp;</span><input type="text" id="term-in" autocomplete="off"></div>
+                <div id="term-hist">Web-Mint v28.0 | Type 'help' or 'neofetch'</div>
+                <div style="display:flex"><span style="color:#4af626">mint@web:~$ &nbsp;</span><input type="text" id="term-in" autocomplete="off" spellcheck="false"></div>
             </div>
         </div>
     </div>
 
     <!-- BROWSER (CLOAKED) -->
-    <div id="b-win" class="win" style="top: 80px; left: 280px; width: 600px; height: 300px;">
-        <div class="hdr"><span>🌐 Cloaked Browser Launcher</span><button class="close-btn" onclick="closeWin('b-win')">X</button></div>
+    <div id="b-win" class="win" style="top: 80px; left: 280px; width: 600px; height: 320px;">
+        <div class="hdr"><span>🌐 Browser Launcher</span><button class="close-btn" onclick="closeWin('b-win')">X</button></div>
         <div class="content" style="padding: 20px; text-align: center;">
-            <h3>Stealth Mode</h3>
-            <p>Launches in a new <b>about:blank</b> window to bypass "Refused to Connect" errors and school filters.</p>
-            <div class="browser-bar">
-                <input type="text" id="url-bar" value="google.com">
-                <button onclick="launchCloaked()" style="background:#4ea84e; color:white; border:none; padding:8px 15px; border-radius:4px; cursor:pointer;">Launch Tab</button>
+            <h3>Stealth Web</h3>
+            <p>Launches sites in an <b>about:blank</b> cloak to bypass "Refused to Connect" blocks.</p>
+            <div style="display:flex; gap:10px; margin-top:15px;">
+                <input type="text" id="url-bar" value="google.com" style="flex:1; padding:8px;">
+                <button onclick="launchCloaked()" style="background:#4ea84e; color:white; border:none; padding:8px 15px; border-radius:4px; cursor:pointer;">Launch</button>
             </div>
         </div>
     </div>
 
-    <!-- APP STORE -->
+    <!-- APP STORE (RESTORED) -->
     <div id="a-win" class="win" style="top: 120px; left: 400px; width: 500px; height: 450px;">
         <div class="hdr"><span>🛍️ Mint Store</span><button class="close-btn" onclick="closeWin('a-win')">X</button></div>
         <div class="content" style="overflow-y:auto;">
             <div class="store-item">
-                <div><b>Cinnamon UI</b><br><small>Classic Mint experience</small></div>
-                <button onclick="alert('Already Installed')">Installed</button>
+                <div><b>GN Math</b><br><small>Unblocked Games Hub</small></div>
+                <button onclick="installApp('GN_Math.html', 'https://blink.new/p/gn-math-hub-j6ipw63x')">Install</button>
             </div>
             <div class="store-item">
-                <div><b>Proxy Plus</b><br><small>Advanced web unblocker</small></div>
-                <button onclick="installApp('ProxyPlus.os', '<h1>Proxy Plus</h1><p>Searching for nodes...</p>')">Install</button>
+                <div><b>Recovery Tool</b><br><small>System repair (mint.os)</small></div>
+                <button onclick="installApp('emergency.os', 'SYSTEM_RECOVERY_KEY')">Download</button>
             </div>
         </div>
     </div>
@@ -83,7 +84,7 @@
         <div class="hdr"><span>📁 Explorer</span><button class="close-btn" onclick="closeWin('e-win')">X</button></div>
         <div class="content">
             <div style="padding:10px; background:#f0f0f0; border-bottom:1px solid #ccc;">
-                <button onclick="createFile()">+ New File (.html/.os)</button>
+                <button onclick="createFile()">+ Create File</button>
             </div>
             <div id="explorer-view" style="overflow-y:auto; height:100%;"></div>
         </div>
@@ -101,69 +102,92 @@
 <script>
     let highestZ = 1000;
     let virtualFS = { 
-        "readme.os": "<h1>System Note</h1><p>Running .os files works!</p>",
-        "index.html": "<h2>Web Mint Desktop</h2>" 
+        "emergency.os": "RECOVERY_DATA_V28",
+        "welcome.html": "<h1>Welcome</h1>" 
     };
 
-    function openWin(id) {
-        const win = document.getElementById(id);
-        win.style.display = 'flex';
-        win.style.zIndex = ++highestZ;
+    function openWin(id) { 
+        const w = document.getElementById(id);
+        w.style.display = 'flex'; 
+        w.style.zIndex = ++highestZ; 
     }
     function closeWin(id) { document.getElementById(id).style.display = 'none'; }
 
-    // CLOAKED BROWSER (Bypasses Connection Refusal)
+    // CLOAKED BROWSER
     function launchCloaked() {
         let val = document.getElementById('url-bar').value;
         if(!val.startsWith('http')) val = "https://" + val;
-        
         let win = window.open('about:blank', '_blank');
         if (win) {
             win.document.body.style.margin = '0';
-            win.document.body.style.height = '100vh';
             let iframe = win.document.createElement('iframe');
-            iframe.style = "border:none; width:100%; height:100%; margin:0;";
+            iframe.style = "border:none; width:100%; height:100vh;";
             iframe.src = val;
             win.document.body.appendChild(iframe);
-        } else {
-            alert("Pop-up blocked! Please enable pop-ups for the browser.");
         }
     }
 
-    // FILE & APP SYSTEM
+    // TERMINAL COMMANDS
+    const tin = document.getElementById('term-in');
+    const thist = document.getElementById('term-hist');
+    tin.addEventListener('keydown', (e) => {
+        if(e.key === 'Enter') {
+            const input = tin.value.trim().toLowerCase();
+            thist.innerHTML += `\nmint@web:~$ ${tin.value}`;
+            if(input === 'help') thist.innerHTML += `\nCommands: help, ls, neofetch, clear, recover`;
+            else if(input === 'ls') thist.innerHTML += `\n${Object.keys(virtualFS).join('  ')}`;
+            else if(input === 'neofetch') thist.innerHTML += `\nWeb-Mint OS v28.0\nKernel: Browser-V8\nUptime: 100%`;
+            else if(input === 'clear') thist.innerHTML = "Terminal Cleared.";
+            else if(input === 'recover') {
+                thist.innerHTML += "\n[SYSTEM] Booting emergency.os recovery...";
+                setTimeout(() => runFile('emergency.os'), 1000);
+            }
+            tin.value = "";
+            thist.scrollTop = 9999;
+        }
+    });
+
+    // FILE SYSTEM & .OS EXECUTION
+    function runFile(name) {
+        const content = virtualFS[name];
+        if (name.endsWith('.os')) {
+            alert("SYSTEM FLASH: " + name + " is updating the system core...");
+            document.body.style.filter = "hue-rotate(90deg)";
+            setTimeout(() => {
+                document.body.style.filter = "none";
+                alert("OS updated successfully via .os file.");
+            }, 2000);
+        } else if (content.startsWith('http')) {
+            window.open(content, '_blank');
+        } else {
+            let win = window.open('about:blank', '_blank');
+            win.document.write(content);
+        }
+    }
+
+    function installApp(name, data) {
+        virtualFS[name] = data;
+        loadExplorer();
+        alert(name + " added to Explorer!");
+    }
+
     function loadExplorer() {
         const view = document.getElementById('explorer-view');
         view.innerHTML = "";
         Object.keys(virtualFS).forEach(f => {
             const item = document.createElement('div');
-            item.style = "padding:12px; cursor:pointer; border-bottom:1px solid #ddd; color:black; display:flex; justify-content:space-between;";
-            item.innerHTML = `<span>📄 ${f}</span> <button onclick="runFile('${f}')">RUN</button>`;
+            item.style = "padding:10px; cursor:pointer; border-bottom:1px solid #ddd; display:flex; justify-content:space-between; color:black;";
+            item.innerHTML = `<span>📄 ${f}</span> <button onclick="runFile('${f}')">EXECUTE</button>`;
             view.appendChild(item);
         });
     }
 
-    function runFile(filename) {
-        const content = virtualFS[filename];
-        const runWin = window.open('about:blank', '_blank');
-        runWin.document.write(content);
-        runWin.document.close();
-    }
-
-    function installApp(name, code) {
-        virtualFS[name] = code;
-        loadExplorer();
-        alert(name + " added to Explorer!");
-    }
-
     function createFile() {
-        const name = prompt("Filename (must end in .html or .os):");
-        if(name) {
-            virtualFS[name] = prompt("Enter HTML code:");
-            loadExplorer();
-        }
+        const n = prompt("Filename (e.g. game.html):");
+        if(n) { virtualFS[n] = prompt("Code/Content:"); loadExplorer(); }
     }
 
-    // Window Draggable
+    // Drag Logic
     document.querySelectorAll('.win').forEach(win => {
         const h = win.querySelector('.hdr');
         h.onmousedown = (e) => {
