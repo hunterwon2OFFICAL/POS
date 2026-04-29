@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Web Mint OS v9.0</title>
+    <title>Web Mint OS v13.0 - Proxy Engine</title>
     <style>
         * { box-sizing: border-box; }
         body { 
@@ -12,71 +12,78 @@
 
         #desktop { width: 100%; height: calc(100vh - 45px); position: relative; }
 
-        /* Taskbar */
+        /* Panel */
         #panel { 
             position: fixed; bottom: 0; width: 100%; height: 45px; 
             background: #23272e; display: flex; align-items: center; 
             padding: 0 10px; border-top: 1px solid #444; z-index: 10000;
         }
-
         .p-btn { background: #4ea84e; color: white; border: none; padding: 6px 12px; cursor: pointer; margin-right: 8px; border-radius: 4px; font-weight: bold; }
-        #clock { margin-left: auto; font-family: monospace; font-size: 14px; color: #aaa; }
+        #clock { margin-left: auto; font-family: monospace; color: #aaa; }
 
         /* Windows */
-        .win { position: absolute; width: 650px; height: 450px; background: #383c4a; display: none; flex-direction: column; border-radius: 6px; box-shadow: 0 15px 40px rgba(0,0,0,0.8); border: 1px solid #555; }
-        .hdr { background: #23272e; padding: 10px; display: flex; justify-content: space-between; align-items: center; border-radius: 6px 6px 0 0; cursor: grab; }
+        .win { position: absolute; width: 800px; height: 500px; background: #383c4a; display: none; flex-direction: column; border-radius: 6px; box-shadow: 0 15px 40px rgba(0,0,0,0.8); border: 1px solid #555; overflow: hidden;}
+        .hdr { background: #23272e; padding: 10px; display: flex; justify-content: space-between; align-items: center; border-radius: 6px 6px 0 0; cursor: grab; user-select: none; flex-shrink: 0;}
         .content { flex-grow: 1; display: flex; flex-direction: column; overflow: hidden; background: #fff; color: #000;}
         .close-btn { background: #e74c3c; color: white; border: none; border-radius: 3px; cursor: pointer; padding: 2px 8px; }
 
-        /* Terminal - High Contrast */
+        /* Terminal Style */
         #term-box { background: #000; color: #4af626; height: 100%; display: flex; flex-direction: column; padding: 10px; font-family: 'Courier New', monospace; }
-        #term-hist { flex-grow: 1; overflow-y: auto; white-space: pre-wrap; font-size: 14px; line-height: 1.4; }
-        #term-in { background: transparent; color: #4af626; border: none; outline: none; flex-grow: 1; font-family: inherit; font-size: 14px; }
+        #term-hist { flex-grow: 1; overflow-y: auto; white-space: pre-wrap; font-size: 14px; }
+        .prompt { color: #4af626; font-weight: bold; }
+        #term-in { background: transparent; color: #fff; border: none; outline: none; flex-grow: 1; font-family: inherit; font-size: 14px; }
+
+        /* Browser Header */
+        .browser-bar { background: #eee; padding: 10px; display: flex; gap: 8px; border-bottom: 1px solid #ccc; flex-shrink: 0;}
+        .browser-bar input { flex-grow: 1; padding: 6px; border: 1px solid #bbb; border-radius: 4px; outline: none;}
+        iframe { width: 100%; flex-grow: 1; border: none; background: white; }
+
+        /* Explorer */
+        .file-item { padding: 12px; cursor: pointer; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #ddd; }
+        .file-item:hover { background: #e8f5e9; }
 
         /* Icons */
         .icon { position: absolute; width: 90px; text-align: center; cursor: pointer; padding: 10px; color: white; text-shadow: 1px 1px 4px black; }
+        .icon:hover { background: rgba(255,255,255,0.1); border-radius: 8px; }
         .icon span { font-size: 32px; display: block; margin-bottom: 5px; }
     </style>
 </head>
 <body>
 
 <div id="desktop">
-    <!-- Desktop Icons -->
     <div class="icon" style="top: 20px; left: 20px;" onclick="openWin('t-win')"><span>🖥️</span>Terminal</div>
     <div class="icon" style="top: 130px; left: 20px;" onclick="openWin('e-win')"><span>📁</span>Files</div>
     <div class="icon" style="top: 240px; left: 20px;" onclick="openWin('b-win')"><span>🌐</span>Browser</div>
 
     <!-- TERMINAL -->
-    <div id="t-win" class="win" style="top: 50px; left: 150px;">
+    <div id="t-win" class="win" style="top: 50px; left: 150px; width: 650px; height: 400px;">
         <div class="hdr"><span>🖥️ Terminal</span><button class="close-btn" onclick="closeWin('t-win')">X</button></div>
         <div class="content" style="background:#000;">
             <div id="term-box" onclick="document.getElementById('term-in').focus()">
-                <div id="term-hist">Web-Mint [v9.0] - Welcome!&#10;Type 'help' for commands.</div>
-                <div style="display:flex"><span>mint@web:~$</span><input type="text" id="term-in" spellcheck="false" autocomplete="off"></div>
+                <div id="term-hist">Web-Mint Linux [v13.0]&#10;Type 'help' for commands. Try: neofetch, ls, date</div>
+                <div style="display:flex"><span class="prompt">mint@web:~$ &nbsp;</span><input type="text" id="term-in" spellcheck="false" autocomplete="off"></div>
             </div>
         </div>
     </div>
 
-    <!-- BROWSER (Using Google Sandbox) -->
-    <div id="b-win" class="win" style="top: 80px; left: 350px; width: 800px; height: 500px;">
-        <div class="hdr"><span>🌐 Mint Browser</span><button class="close-btn" onclick="closeWin('b-win')">X</button></div>
+    <!-- BROWSER (Proxied Implementation) -->
+    <div id="b-win" class="win" style="top: 80px; left: 300px; width: 850px; height: 550px;">
+        <div class="hdr"><span>🌐 Mint Browser (Stealth Proxy)</span><button class="close-btn" onclick="closeWin('b-win')">X</button></div>
         <div class="content">
-            <iframe id="browser-frame" src="https://google.com" style="width:100%; height:100%; border:none;"></iframe>
+            <div class="browser-bar">
+                <input type="text" id="browser-url" placeholder="Enter URL (e.g., wikipedia.org)">
+                <button onclick="navigateProxy()" style="padding: 5px 15px; cursor:pointer;">Go</button>
+            </div>
+            <iframe id="browser-frame" src="about:blank"></iframe>
         </div>
     </div>
 
-    <!-- Explorer -->
-    <div id="e-win" class="win" style="top: 150px; left: 100px;">
+    <!-- Explorer & Notepad same as before -->
+    <div id="e-win" class="win" style="top: 150px; left: 100px; width: 450px;">
         <div class="hdr"><span>📁 Explorer</span><button class="close-btn" onclick="closeWin('e-win')">X</button></div>
-        <div class="content">
-            <div style="padding:10px; background:#eee; border-bottom:1px solid #ccc;">
-                <button onclick="createNewFile()">+ New File</button>
-            </div>
-            <div id="explorer-view" style="overflow-y:auto; color:black; height:100%;"></div>
-        </div>
+        <div class="content"><div id="explorer-view" style="overflow-y:auto; color:black;"></div></div>
     </div>
 
-    <!-- Notepad -->
     <div id="n-win" class="win" style="top: 120px; left: 450px; width: 500px; height: 400px;">
         <div class="hdr"><span id="note-title">📄 Notepad</span><button class="close-btn" onclick="closeWin('n-win')">X</button></div>
         <div class="content">
@@ -86,92 +93,109 @@
     </div>
 </div>
 
-<!-- Taskbar -->
 <div id="panel">
-    <button class="p-btn" style="background:#2ecc71" onclick="openWin('t-win')">🖥️ Terminal</button>
-    <button class="p-btn" onclick="openWin('e-win')">📁 Files</button>
-    <button class="p-btn" onclick="openWin('b-win')">🌐 Browser</button>
+    <button class="p-btn" style="background:#2ecc71" onclick="openWin('t-win')">Terminal</button>
+    <button class="p-btn" onclick="openWin('e-win')">Files</button>
+    <button class="p-btn" onclick="openWin('b-win')">Browser</button>
     <div id="clock">00:00:00</div>
 </div>
 
 <script>
     let highestZ = 1000;
-    let currentFile = "";
-    let virtualFS = { "readme.txt": "Terminal fixed. Browser set to Google Sandbox." };
+    let virtualFS = { "readme.txt": "Proxy Engine v13 loaded. \nTerminal is fully functional!" };
 
     function openWin(id) {
         const win = document.getElementById(id);
         win.style.display = 'flex';
-        focusWin(win);
+        win.style.zIndex = ++highestZ;
         if(id === 't-win') setTimeout(() => document.getElementById('term-in').focus(), 100);
     }
     function closeWin(id) { document.getElementById(id).style.display = 'none'; }
-    function focusWin(win) { highestZ++; win.style.zIndex = highestZ; }
 
-    setInterval(() => {
-        document.getElementById('clock').innerText = new Date().toLocaleTimeString();
-    }, 1000);
+    setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString(); }, 1000);
 
-    function loadExplorer() {
-        const view = document.getElementById('explorer-view');
-        view.innerHTML = "";
-        for (let file in virtualFS) {
-            const item = document.createElement('div');
-            item.style = "padding:12px; cursor:pointer; border-bottom:1px solid #ddd;";
-            item.innerHTML = `📄 ${file}`;
-            item.onclick = () => openFile(file);
-            view.appendChild(item);
-        }
-    }
-    function createNewFile() {
-        const name = prompt("File name:");
-        if(name) { virtualFS[name] = ""; loadExplorer(); }
-    }
-    function openFile(name) {
-        currentFile = name;
-        document.getElementById('note-title').innerText = name;
-        document.getElementById('editor-area').value = virtualFS[name];
-        openWin('n-win');
-    }
-    function saveFile() {
-        if(currentFile) { virtualFS[currentFile] = document.getElementById('editor-area').value; alert("Saved!"); }
+    // BROWSER NAVIGATION (PROXY ENGINE)
+    function navigateProxy() {
+        let val = document.getElementById('browser-url').value;
+        if(!val) return;
+        if(!val.includes('://')) val = 'https://' + val;
+        
+        // This is a CORSPROXY-style engine that tries to bypass headers
+        // We use a public unblocker prefix
+        const proxyPrefix = "https://shrtno.de"; 
+        document.getElementById('browser-frame').src = proxyPrefix + val;
     }
 
-    // Terminal Commands
+    // TERMINAL ENGINE (RESTORED & ENHANCED)
     const tin = document.getElementById('term-in');
     const thist = document.getElementById('term-hist');
+    
     tin.addEventListener('keydown', (e) => {
         if(e.key === 'Enter') {
-            const val = tin.value.trim();
-            const cmd = val.toLowerCase();
-            thist.innerHTML += `\nmint@web:~$ ${val}`;
-            if(cmd === 'ls') thist.innerHTML += `\n${Object.keys(virtualFS).join('  ')}`;
-            else if(cmd === 'neofetch') thist.innerHTML += `\n<b>Web Mint 9.0</b>\nKernel: JavaScript-Core\nShell: Bash-Emu`;
-            else if(cmd === 'clear') thist.innerHTML = "Terminal cleared.";
-            else if(val !== "") thist.innerHTML += `\n'${val}' not found.`;
+            const input = tin.value.trim();
+            const parts = input.split(' ');
+            const cmd = parts[0].toLowerCase();
+            const arg = parts[1];
+
+            thist.innerHTML += `\nmint@web:~$ ${input}`;
+
+            if(cmd === 'help') {
+                thist.innerHTML += `\nCommands: ls, neofetch, clear, cat [file], date, whoami`;
+            } else if(cmd === 'ls') {
+                thist.innerHTML += `\n${Object.keys(virtualFS).join('   ')}`;
+            } else if(cmd === 'neofetch') {
+                thist.innerHTML += `\n<b>Web Mint OS 13.0</b>\nKernel: JS-V8-Engine\nShell: MintBash\nProxy: Scram-Emu`;
+            } else if(cmd === 'clear') {
+                thist.innerHTML = "Terminal cleared.";
+            } else if(cmd === 'date') {
+                thist.innerHTML += `\n${new Date().toString()}`;
+            } else if(cmd === 'cat' && arg) {
+                thist.innerHTML += `\n${virtualFS[arg] || "File not found."}`;
+            } else if(input !== "") {
+                thist.innerHTML += `\n'${cmd}' not recognized.`;
+            }
+
             tin.value = "";
             thist.scrollTop = 9999;
         }
     });
 
-    // Window Dragging
+    // EXPLORER LOGIC
+    function loadExplorer() {
+        const view = document.getElementById('explorer-view');
+        view.innerHTML = "";
+        for (let f in virtualFS) {
+            const item = document.createElement('div');
+            item.className = 'file-item';
+            item.innerHTML = `📄 ${f}`;
+            item.onclick = () => openFile(f);
+            view.appendChild(item);
+        }
+    }
+    function openFile(n) {
+        document.getElementById('note-title').innerText = n;
+        document.getElementById('editor-area').value = virtualFS[n];
+        openWin('n-win');
+    }
+    function saveFile() {
+        const name = document.getElementById('note-title').innerText;
+        virtualFS[name] = document.getElementById('editor-area').value;
+        alert("Saved!");
+    }
+
+    // DRAGGING
     document.querySelectorAll('.win').forEach(win => {
-        const header = win.querySelector('.hdr');
-        header.onmousedown = function(e) {
-            focusWin(win);
-            let sx = e.clientX - win.offsetLeft;
-            let sy = e.clientY - win.offsetTop;
-            document.onmousemove = (e) => {
-                win.style.left = (e.clientX - sx) + 'px';
-                win.style.top = (e.clientY - sy) + 'px';
-            };
+        const h = win.querySelector('.hdr');
+        h.onmousedown = (e) => {
+            win.style.zIndex = ++highestZ;
+            let sx = e.clientX - win.offsetLeft, sy = e.clientY - win.offsetTop;
+            document.onmousemove = (e) => { win.style.left = e.clientX-sx+'px'; win.style.top = e.clientY-sy+'px'; };
             document.onmouseup = () => document.onmousemove = null;
         };
-        win.onmousedown = () => focusWin(win);
+        win.onmousedown = () => win.style.zIndex = ++highestZ;
     });
 
     loadExplorer();
 </script>
-
 </body>
 </html>
