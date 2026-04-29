@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Web Mint OS v24.0 - Emergency Recovery</title>
+    <title>Web Mint OS v25.0 - Bulletproof Core</title>
     <style>
         * { box-sizing: border-box; }
         body { 
@@ -11,28 +11,22 @@
         }
 
         #desktop { width: 100%; height: calc(100vh - 45px); position: relative; }
-
-        /* Panel */
         #panel { position: fixed; bottom: 0; width: 100%; height: 45px; background: #23272e; display: flex; align-items: center; padding: 0 10px; border-top: 1px solid #444; z-index: 10000; }
         .p-btn { background: #4ea84e; color: white; border: none; padding: 6px 12px; cursor: pointer; margin-right: 8px; border-radius: 4px; font-weight: bold; }
         #clock { margin-left: auto; font-family: monospace; color: #aaa; }
 
-        /* Windows */
-        .win { position: absolute; width: 700px; height: 450px; background: #383c4a; display: none; flex-direction: column; border-radius: 6px; box-shadow: 0 15px 40px rgba(0,0,0,0.8); border: 1px solid #555; overflow: hidden; }
+        .win { position: absolute; width: 700px; height: 450px; background: #383c4a; display: none; flex-direction: column; border-radius: 6px; box-shadow: 0 15px 40px rgba(0,0,0,0.8); border: 1px solid #555; overflow: hidden; z-index: 100; }
         .hdr { background: #23272e; padding: 10px; display: flex; justify-content: space-between; align-items: center; cursor: grab; user-select: none; }
-        .content { flex-grow: 1; display: flex; flex-direction: column; overflow: hidden; background: #fff; color: #000;}
+        .content { flex-grow: 1; display: flex; flex-direction: column; overflow: hidden; background: #fff; color: #000; position: relative; }
         .close-btn { background: #e74c3c; color: white; border: none; border-radius: 3px; cursor: pointer; padding: 2px 8px; }
 
-        /* Terminal */
         #term-box { background: #000; color: #4af626; height: 100%; display: flex; flex-direction: column; padding: 10px; font-family: monospace; }
         #term-hist { flex-grow: 1; overflow-y: auto; white-space: pre-wrap; font-size: 14px; }
         #term-in { background: transparent; color: #fff; border: none; outline: none; flex-grow: 1; font-family: inherit; font-size: 14px; }
 
-        /* Icons */
         .icon { position: absolute; width: 90px; text-align: center; cursor: pointer; padding: 10px; color: white; text-shadow: 1px 1px 4px black; }
         .icon span { font-size: 32px; display: block; margin-bottom: 5px; }
         
-        /* Explorer & Notepad */
         .file-item { padding: 12px; cursor: pointer; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #eee; }
         .file-item:hover { background: #e8f5e9; }
     </style>
@@ -48,52 +42,50 @@
     <!-- TERMINAL -->
     <div id="t-win" class="win" style="top: 50px; left: 150px; width: 650px; height: 400px;">
         <div class="hdr"><span>🖥️ Terminal</span><button class="close-btn" onclick="closeWin('t-win')">X</button></div>
-        <div class="content" style="background:#000;"><div id="term-box" onclick="document.getElementById('term-in').focus()"><div id="term-hist">Web-Mint v24.0. Type 'help'.</div><div style="display:flex"><span>mint@web:~$ &nbsp;</span><input type="text" id="term-in" spellcheck="false" autocomplete="off"></div></div></div>
+        <div class="content" style="background:#000;"><div id="term-box" onclick="document.getElementById('term-in').focus()"><div id="term-hist">Web-Mint v25.0. Type 'help'.</div><div style="display:flex"><span>mint@web:~$ &nbsp;</span><input type="text" id="term-in" spellcheck="false" autocomplete="off"></div></div></div>
     </div>
 
-    <!-- BROWSER (Using Bing - Highest Compatibility) -->
+    <!-- BROWSER (Stable Proxy) -->
     <div id="b-win" class="win" style="top: 80px; left: 300px; width: 900px; height: 600px;">
-        <div class="hdr"><span>🌐 Browser (Stable)</span><button class="close-btn" onclick="closeWin('b-win')">X</button></div>
+        <div class="hdr"><span>🌐 Browser</span><button class="close-btn" onclick="closeWin('b-win')">X</button></div>
         <div class="content">
-            <div style="background:#eee; padding:8px; display:flex; gap:5px;">
-                <input type="text" id="url-input" style="flex-grow:1" value="https://bing.com">
-                <button onclick="navBrowser()">Go</button>
-            </div>
-            <iframe id="browser-frame" src="https://bing.com" style="width:100%; height:100%; border:none;"></iframe>
+            <div style="background:#eee; padding:8px; display:flex; gap:5px;"><input type="text" id="url-input" style="flex-grow:1" value="https://duckduckgo.com"><button onclick="navBrowser()">Go</button></div>
+            <iframe id="browser-frame" src="https://duckduckgo.com" style="width:100%; height:100%; border:none;"></iframe>
         </div>
     </div>
 
-    <!-- SETTINGS (Emergency Recovery) -->
+    <!-- SETTINGS (Hard-Coded) -->
     <div id="s-win" class="win" style="top: 150px; left: 400px; width: 450px; height: 350px;">
         <div class="hdr"><span>⚙️ Settings</span><button class="close-btn" onclick="closeWin('s-win')">X</button></div>
-        <div class="content">
-            <div style="padding:20px; border-bottom:1px solid #eee; color:black;">
-                <b>Emergency Recovery</b><br>
-                <p style="font-size:12px;">If the OS glitches, click below to restore the factory Mint OS.</p>
-                <button onclick="factoryReset()" style="background:#e74c3c; color:white; border:none; padding:10px; border-radius:4px; cursor:pointer;">Factory Reset OS</button>
-            </div>
+        <div class="content" style="padding:20px; color:black;">
+            <b>System Recovery</b><br><br>
+            <button onclick="factoryReset()" style="background:#e74c3c; color:white; border:none; padding:10px; border-radius:4px; cursor:pointer; width:100%;">FACTORY RESET OS</button>
+            <br><br><b>Custom Wallpaper</b><br><input type="text" id="bg-input" style="width:100%; margin-top:5px;"><button onclick="document.body.style.backgroundImage = 'url('+document.getElementById('bg-input').value+')'" style="margin-top:5px; cursor:pointer;">Apply Wallpaper</button>
         </div>
     </div>
 
     <!-- EXPLORER -->
     <div id="e-win" class="win" style="top: 100px; left: 100px; width: 450px;">
         <div class="hdr"><span>📁 Explorer</span><button class="close-btn" onclick="closeWin('e-win')">X</button></div>
-        <div class="content">
-            <div style="padding:10px; background:#f0f0f0;"><button onclick="createNewFile()">+ New File</button></div>
-            <div id="explorer-view" style="overflow-y:auto; color:black; height:100%;"></div>
-        </div>
+        <div class="content"><div style="padding:10px; background:#f0f0f0;"><button onclick="createNewFile()">+ New File</button></div><div id="explorer-view" style="overflow-y:auto; color:black; height:100%;"></div></div>
     </div>
 
-    <!-- NOTEPAD (File Runner) -->
+    <!-- NOTEPAD (Sandbox Runner) -->
     <div id="n-win" class="win" style="top: 120px; left: 450px; width: 500px; height: 400px;">
         <div class="hdr"><span id="note-title">📄 Notepad</span><button class="close-btn" onclick="closeWin('n-win')">X</button></div>
         <div class="content">
             <textarea id="editor-area" style="width:100%; height:100%; border:none; padding:15px; outline:none; font-family:monospace;"></textarea>
             <div style="background:#ddd; padding:8px; display:flex; justify-content: space-between;">
-                <button onclick="runCurrentFile()" style="background:#2196F3; color:white; border:none; padding:5px 12px; border-radius:4px; cursor:pointer;">🚀 Run File</button>
+                <button onclick="runInSandbox()" style="background:#2196F3; color:white; border:none; padding:5px 12px; border-radius:4px; cursor:pointer;">🚀 RUN IN SANDBOX</button>
                 <button onclick="saveFile()">💾 Save</button>
             </div>
         </div>
+    </div>
+
+    <!-- SANDBOX WINDOW -->
+    <div id="sandbox-win" class="win" style="top: 200px; left: 200px; width: 600px; height: 450px;">
+        <div class="hdr"><span>🧪 App Sandbox</span><button class="close-btn" onclick="closeWin('sandbox-win')">X</button></div>
+        <div class="content"><iframe id="sandbox-frame" style="width:100%; height:100%; border:none;"></iframe></div>
     </div>
 </div>
 
@@ -106,12 +98,8 @@
 
 <script>
     let highestZ = 1000;
-    // Hard-coded Factory Image
-    const FACTORY_CODE = document.documentElement.outerHTML;
-    let virtualFS = { 
-        "readme.txt": "Welcome to v24.0! Use Settings for Factory Reset if needed.",
-        "mint.os": FACTORY_CODE
-    };
+    const ORIGINAL_HTML = document.documentElement.outerHTML;
+    let virtualFS = { "readme.txt": "Welcome to v25.0! Use sandbox to test code." };
 
     function openWin(id) {
         const win = document.getElementById(id);
@@ -120,7 +108,6 @@
         if(id === 't-win') setTimeout(() => document.getElementById('term-in').focus(), 100);
     }
     function closeWin(id) { document.getElementById(id).style.display = 'none'; }
-
     setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString(); }, 1000);
 
     function navBrowser() {
@@ -129,13 +116,8 @@
         document.getElementById('browser-frame').src = val;
     }
 
-    function factoryReset() {
-        if(confirm("Restore Factory Settings? This will reload the OS.")) {
-            document.open(); document.write(FACTORY_CODE); document.close();
-        }
-    }
+    function factoryReset() { if(confirm("This will wipe all changes. Proceed?")) { document.open(); document.write(ORIGINAL_HTML); document.close(); } }
 
-    // TERMINAL
     const tin = document.getElementById('term-in');
     const thist = document.getElementById('term-hist');
     tin.addEventListener('keydown', (e) => {
@@ -143,11 +125,11 @@
             const input = tin.value.trim();
             const cmd = input.toLowerCase();
             thist.innerHTML += `\nmint@web:~$ ${input}`;
-            if(cmd === 'help') thist.innerHTML += `\nCommands: ls, clear, neofetch, help`;
+            if(cmd === 'help') thist.innerHTML += `\nCommands: ls, clear, help, neofetch`;
             else if(cmd === 'ls') thist.innerHTML += `\n${Object.keys(virtualFS).join('  ')}`;
-            else if(cmd === 'neofetch') thist.innerHTML += `\n<b>Web Mint 24.0</b>\nKernel: Factory-Stable\nShell: MintBash`;
+            else if(cmd === 'neofetch') thist.innerHTML += `\n<b>Web Mint 25.0</b>\nKernel: Sandbox-Core\nShell: Bash-Emu`;
             else if(cmd === 'clear') thist.innerHTML = "Terminal cleared.";
-            else if(input !== "") thist.innerHTML += `\n'${cmd}' not recognized.`;
+            else if(input !== "") thist.innerHTML += `\nCommand not found.`;
             tin.value = "";
             thist.scrollTop = 9999;
         }
@@ -160,29 +142,21 @@
             const item = document.createElement('div');
             item.className = 'file-item';
             item.innerHTML = `📄 ${f}`;
-            item.onclick = () => {
-                document.getElementById('note-title').innerText = f;
-                document.getElementById('editor-area').value = virtualFS[f];
-                openWin('n-win');
-            };
+            item.onclick = () => { document.getElementById('note-title').innerText = f; document.getElementById('editor-area').value = virtualFS[f]; openWin('n-win'); };
             view.appendChild(item);
         }
     }
+    function createNewFile() { const n = prompt("Name:"); if(n) { virtualFS[n] = ""; loadExplorer(); } }
+    function saveFile() { virtualFS[document.getElementById('note-title').innerText] = document.getElementById('editor-area').value; alert("Saved."); }
 
-    function createNewFile() {
-        const n = prompt("Filename:");
-        if(n) { virtualFS[n] = ""; loadExplorer(); }
-    }
-
-    function saveFile() {
-        const name = document.getElementById('note-title').innerText;
-        virtualFS[name] = document.getElementById('editor-area').value;
-        alert("Saved.");
-    }
-
-    function runCurrentFile() {
+    // SANDBOX EXECUTION (Fixed running issues)
+    function runInSandbox() {
         const code = document.getElementById('editor-area').value;
-        document.open(); document.write(code); document.close();
+        const frame = document.getElementById('sandbox-frame').contentWindow.document;
+        frame.open();
+        frame.write(code);
+        frame.close();
+        openWin('sandbox-win');
     }
 
     document.querySelectorAll('.win').forEach(win => {
@@ -194,7 +168,6 @@
             document.onmouseup = () => document.onmousemove = null;
         };
     });
-
     loadExplorer();
 </script>
 </body>
