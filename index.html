@@ -2,16 +2,18 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Web Mint - Fixed Terminal</title>
+    <title>Web Mint OS - Cinnamon v2.0</title>
     <style>
-        * { box-sizing: border-box; } /* Prevents layout overflow */
+        * { box-sizing: border-box; }
         body { 
             background: #2f343f; color: white; font-family: 'Segoe UI', sans-serif; 
             margin: 0; padding: 0; overflow: hidden; height: 100vh;
-            background-image: radial-gradient(#444 1px, transparent 1px); background-size: 20px 20px;
         }
 
-        #desktop { width: 100%; height: calc(100vh - 45px); position: relative; }
+        #desktop { 
+            width: 100%; height: calc(100vh - 45px); position: relative;
+            background: url('https://wallpaperaccess.com') center/cover;
+        }
 
         /* Taskbar */
         #panel { 
@@ -21,52 +23,44 @@
         }
 
         .p-btn { 
-            background: #4ea84e; color: white; border: none; padding: 6px 12px; 
+            background: #4ea84e; color: white; border: none; padding: 6px 15px; 
             cursor: pointer; margin-right: 8px; border-radius: 4px; font-weight: bold; 
         }
 
-        /* Window Styling */
+        /* Windows */
         .win { 
             position: absolute; width: 600px; height: 400px; 
             background: #383c4a; display: none; flex-direction: column; 
-            border-radius: 6px; box-shadow: 0 15px 40px rgba(0,0,0,0.5); border: 1px solid #555; 
-            overflow: hidden;
+            border-radius: 6px; box-shadow: 0 15px 40px rgba(0,0,0,0.7); border: 1px solid #555; 
         }
 
         .hdr { 
             background: #23272e; padding: 10px 15px; display: flex; 
             justify-content: space-between; align-items: center;
-            border-radius: 6px 6px 0 0; cursor: grab; user-select: none; flex-shrink: 0;
+            border-radius: 6px 6px 0 0; cursor: grab; user-select: none;
         }
 
         .content { flex-grow: 1; display: flex; flex-direction: column; overflow: hidden; background: #fff; color: #000;}
         .close-btn { background: #e74c3c; color: white; border: none; border-radius: 3px; cursor: pointer; padding: 2px 10px; }
 
-        /* TERMINAL FIX: Flexbox Layout */
-        #term-window-content { 
+        /* Terminal Fix */
+        #term-box { 
             background: #000; color: #4af626; height: 100%; 
-            display: flex; flex-direction: column; padding: 10px; 
-            font-family: 'Consolas', monospace; font-size: 14px;
+            display: flex; flex-direction: column; padding: 12px; 
+            font-family: 'Consolas', 'Courier New', monospace; font-size: 14px;
         }
-        #term-history { 
-            flex-grow: 1; overflow-y: auto; margin-bottom: 5px; 
-            white-space: pre-wrap; word-break: break-all;
-        }
-        .term-input-line { display: flex; flex-shrink: 0; align-items: center; }
+        #term-history { flex-grow: 1; overflow-y: auto; white-space: pre-wrap; margin-bottom: 5px;}
+        .term-line { display: flex; align-items: center; }
         #term-input { 
             background: transparent; color: #4af626; border: none; 
-            outline: none; flex-grow: 1; font-family: inherit; font-size: inherit; 
-            padding-left: 5px;
+            outline: none; flex-grow: 1; font-family: inherit; font-size: inherit; padding-left: 5px;
         }
 
-        /* Browser */
-        .browser-bar { background: #eee; padding: 5px; display: flex; gap: 5px; border-bottom: 1px solid #ccc; flex-shrink: 0; }
-        .browser-bar input { flex-grow: 1; padding: 4px; border: 1px solid #ccc; border-radius: 3px; }
-        iframe { width: 100%; flex-grow: 1; border: none; background: white; }
-
-        /* Explorer */
-        .file-item { padding: 10px; cursor: pointer; display: flex; align-items: center; gap: 10px; color: black; }
+        /* Explorer & Browser */
+        #exp-view { padding: 15px; background: white; height: 100%; }
+        .file-item { padding: 10px; cursor: pointer; display: flex; align-items: center; gap: 10px; border-radius: 4px;}
         .file-item:hover { background: #e8f5e9; }
+        iframe { width: 100%; flex-grow: 1; border: none; }
     </style>
 </head>
 <body>
@@ -76,35 +70,29 @@
     <div id="t-win" class="win" style="top: 30px; left: 30px;">
         <div class="hdr"><span>🖥️ Terminal</span><button class="close-btn" onclick="closeWin('t-win')">X</button></div>
         <div class="content">
-            <div id="term-window-content" onclick="document.getElementById('term-input').focus()">
-                <div id="term-history">Welcome to Web-Mint Terminal&#10;Type 'help' for commands.</div>
-                <div class="term-input-line">
-                    <span>mint@web:~$</span>
-                    <input type="text" id="term-input" spellcheck="false" autocomplete="off">
-                </div>
+            <div id="term-box" onclick="document.getElementById('term-input').focus()">
+                <div id="term-history">Web-Mint [Version 1.0.4]&#10;Type 'help' for commands.</div>
+                <div class="term-line"><span>mint@web:~$</span><input type="text" id="term-input" spellcheck="false" autocomplete="off"></div>
             </div>
         </div>
     </div>
 
     <!-- Browser Window -->
-    <div id="b-win" class="win" style="top: 80px; left: 300px; width: 800px; height: 500px;">
+    <div id="b-win" class="win" style="top: 80px; left: 350px; width: 750px; height: 500px;">
         <div class="hdr"><span>🌐 Browser</span><button class="close-btn" onclick="closeWin('b-win')">X</button></div>
         <div class="content">
-            <div class="browser-bar">
-                <input type="text" id="browser-url" value="https://bing.com">
-                <button onclick="goUrl()">Go</button>
-            </div>
-            <iframe id="browser-frame" src="https://bing.com"></iframe>
+            <iframe src="https://bing.com"></iframe>
         </div>
     </div>
 
     <!-- Explorer Window -->
     <div id="e-win" class="win" style="top: 150px; left: 100px;">
-        <div class="hdr"><span>📁 Explorer</span><button class="close-btn" onclick="closeWin('e-win')">X</button></div>
-        <div class="content">
-            <div class="file-item" onclick="alert('Documents: Empty')">📁 Documents</div>
-            <div class="file-item" onclick="alert('Downloads: Empty')">📁 Downloads</div>
-            <div class="file-item" onclick="openWin('b-win')">🌐 Browser.lnk</div>
+        <div class="hdr"><span>📁 File Explorer</span><button class="close-btn" onclick="closeWin('e-win')">X</button></div>
+        <div class="content" id="exp-view">
+            <div id="path-bar" style="margin-bottom:10px; font-weight:bold;">Home > <span id="current-dir">Documents</span></div>
+            <div id="file-list">
+                <!-- Dynamically loaded -->
+            </div>
         </div>
     </div>
 </div>
@@ -112,18 +100,21 @@
 <div id="panel">
     <button class="p-btn" style="background:#2ecc71">LM</button>
     <button class="p-btn" onclick="openWin('t-win')">Terminal</button>
-    <button class="p-btn" onclick="openWin('e-win')">Files</button>
+    <button class="p-btn" onclick="openWin('e-win'); renderFiles('Documents')">Files</button>
     <button class="p-btn" onclick="openWin('b-win')">Browser</button>
 </div>
 
 <script>
     let highestZ = 100;
+    let files = {
+        'Documents': ['readme.txt', 'notes.pdf', 'work.doc'],
+        'Downloads': ['mint-os-iso.zip', 'wallpaper.png', 'installer.sh']
+    };
 
     function openWin(id) {
         const win = document.getElementById(id);
         win.style.display = 'flex';
         focusWin(win);
-        if(id === 't-win') document.getElementById('term-input').focus();
     }
 
     function closeWin(id) { document.getElementById(id).style.display = 'none'; }
@@ -133,57 +124,66 @@
         win.style.zIndex = highestZ;
     }
 
-    // Terminal Fixed Logic
+    // EXPLORER LOGIC
+    function renderFiles(folder) {
+        document.getElementById('current-dir').innerText = folder;
+        const list = document.getElementById('file-list');
+        list.innerHTML = `<div class="file-item" onclick="renderFiles(this.innerText.includes('Documents') ? 'Documents' : 'Downloads')">🔙 Go Back</div>`;
+        
+        files[folder].forEach(f => {
+            list.innerHTML += `<div class="file-item" onclick="alert('Opening ${f}...')">📄 ${f}</div>`;
+        });
+
+        if(folder === 'Documents') {
+            list.innerHTML += `<div class="file-item" onclick="renderFiles('Downloads')">📁 Downloads</div>`;
+        }
+    }
+
+    // TERMINAL COMMANDS
     const termInput = document.getElementById('term-input');
     const termHistory = document.getElementById('term-history');
 
     termInput.addEventListener('keydown', function(e) {
         if (e.key === 'Enter') {
-            const val = this.value;
-            const cmd = val.trim().toLowerCase();
-            
+            const val = this.value.trim();
+            const cmd = val.toLowerCase();
             termHistory.innerHTML += `\nmint@web:~$ ${val}`;
             
             if (cmd === 'help') {
-                termHistory.innerHTML += "\nAvailable: help, clear, ls, browser";
+                termHistory.innerHTML += "\n- ls: List files\n- clear: Clear screen\n- whoami: Current user\n- neofetch: System info\n- date: Show time\n- browser: Open Web\n- echo [text]: Repeat text";
+            } else if (cmd === 'ls') {
+                termHistory.innerHTML += "\nDocuments/  Downloads/  readme.txt";
             } else if (cmd === 'clear') {
                 termHistory.innerHTML = "Terminal cleared.";
-            } else if (cmd === 'ls') {
-                termHistory.innerHTML += "\nDocuments  Downloads  Browser.lnk";
-            } else if (cmd === 'browser') {
-                openWin('b-win');
-                termHistory.innerHTML += "\nLaunching Browser...";
+            } else if (cmd === 'whoami') {
+                termHistory.innerHTML += "\nmint_user_99";
+            } else if (cmd === 'date') {
+                termHistory.innerHTML += "\n" + new Date().toLocaleString();
+            } else if (cmd === 'neofetch') {
+                termHistory.innerHTML += "\n <span style='color:white'>  ./osssso/.   </span><b>OS</b>: Mint Web 2026\n <span style='color:white'> :osssssssso: </span><b>Kernel</b>: v1.0.4-wasm\n <span style='color:white'> `ossssssss`  </span><b>Shell</b>: bash-web\n <span style='color:white'>   `ossss`    </span><b>DE</b>: Cinnamon-HTML";
+            } else if (cmd.startsWith('echo ')) {
+                termHistory.innerHTML += "\n" + val.substring(5);
             } else if (cmd !== "") {
-                termHistory.innerHTML += `\nCommand '${cmd}' not found.`;
+                termHistory.innerHTML += `\n'${cmd}' is not recognized. Type 'help'.`;
             }
             
             this.value = "";
-            // Auto-scroll to bottom
-            const container = document.getElementById('term-history');
-            container.scrollTop = container.scrollHeight;
+            const box = document.getElementById('term-history');
+            box.scrollTop = box.scrollHeight;
         }
     });
 
-    // Browser Logic
-    function goUrl() {
-        let url = document.getElementById('browser-url').value;
-        if (!url.startsWith('http')) url = 'https://' + url;
-        document.getElementById('browser-frame').src = url;
-    }
-
-    // Improved Dragging (Prevents window from disappearing)
+    // DRAGGING ENGINE
     document.querySelectorAll('.win').forEach(win => {
         const header = win.querySelector('.hdr');
         header.onmousedown = function(e) {
             focusWin(win);
             let shiftX = e.clientX - win.getBoundingClientRect().left;
             let shiftY = e.clientY - win.getBoundingClientRect().top;
-
             function moveAt(pageX, pageY) {
-                win.style.left = pageX - shiftX + 'px';
-                win.style.top = pageY - shiftY + 'px';
+                win.style.left = (pageX - shiftX) + 'px';
+                win.style.top = (pageY - shiftY) + 'px';
             }
-
             function onMouseMove(e) { moveAt(e.pageX, e.pageY); }
             document.addEventListener('mousemove', onMouseMove);
             document.onmouseup = function() {
@@ -191,8 +191,10 @@
                 document.onmouseup = null;
             };
         };
-        win.onmousedown = () => focusWin(win);
     });
+
+    // Default Load
+    renderFiles('Documents');
 </script>
 
 </body>
