@@ -2,209 +2,127 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Web Mint OS - All-In-One</title>
+    <title>Web Mint - Cinnamon Edition</title>
     <style>
-        /* --- ALL CSS STYLES --- */
-        body, html {
-            margin: 0; padding: 0; height: 100%;
-            font-family: 'Ubuntu', sans-serif;
-            overflow: hidden;
-            background: linear-gradient(135deg, #2c3e50, #000000);
-            color: #fff;
-        }
+        body, html { margin: 0; padding: 0; height: 100%; font-family: 'Segoe UI', sans-serif; overflow: hidden; background: #2f343f; color: #fff; }
+        #desktop { height: calc(100vh - 40px); position: relative; padding: 20px; display: flex; flex-direction: column; gap: 20px; }
+        .desktop-icon { width: 80px; text-align: center; cursor: pointer; padding: 10px; border-radius: 4px; z-index: 5; }
+        .desktop-icon:hover { background: rgba(255, 255, 255, 0.1); }
+        .icon-symbol { font-size: 40px; display: block; }
+        
+        #panel { height: 40px; background: #23272e; border-top: 1px solid #444; display: flex; align-items: center; padding: 0 10px; position: fixed; bottom: 0; width: 100%; z-index: 1000; }
+        #menu-btn { background: #4ea84e; border: none; padding: 4px 10px; color: white; border-radius: 3px; cursor: pointer; margin-right: 15px; }
 
-        #desktop {
-            height: calc(100vh - 40px);
-            position: relative;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            align-content: flex-start;
-            flex-wrap: wrap;
-        }
+        .window { position: absolute; width: 500px; height: 350px; background: #383c4a; border: 1px solid #444; box-shadow: 0 10px 25px rgba(0,0,0,0.5); display: none; flex-direction: column; border-radius: 6px 6px 0 0; z-index: 10; }
+        .window-header { background: #2f343f; padding: 8px 12px; display: flex; justify-content: space-between; align-items: center; cursor: move; }
+        .close-btn { background: #e74c3c; border: none; color: white; border-radius: 50%; width: 20px; height: 20px; cursor: pointer; }
 
-        .icon {
-            width: 90px; text-align: center; cursor: pointer; padding: 10px;
-            border-radius: 5px; transition: 0.2s;
-        }
-        .icon:hover { background: rgba(255, 255, 255, 0.1); }
-        .icon img { width: 48px; height: 48px; display: block; margin: 0 auto 5px; }
-
-        #panel {
-            height: 40px; background: rgba(35, 35, 35, 0.95);
-            border-top: 1px solid #444; display: flex;
-            align-items: center; padding: 0 10px;
-            position: fixed; bottom: 0; width: 100%; z-index: 1000;
-        }
-
-        #start-menu-btn {
-            background: #4ea84e; border: none; padding: 5px 12px;
-            color: white; font-weight: bold; border-radius: 3px;
-            cursor: pointer; margin-right: 15px;
-        }
-
-        /* Unified Window System */
-        .window {
-            position: absolute; width: 600px; height: 400px;
-            background: #2b2b2b; border: 1px solid #555;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            display: none; flex-direction: column;
-            border-radius: 6px 6px 0 0; overflow: hidden; z-index: 10;
-        }
-
-        .window-header {
-            background: #333; padding: 8px 12px;
-            display: flex; justify-content: space-between;
-            align-items: center; cursor: move;
-            border-bottom: 1px solid #444;
-        }
-
-        .close-btn {
-            background: #e74c3c; border: none; color: white;
-            width: 20px; height: 20px; border-radius: 50%; cursor: pointer;
-        }
-
-        /* Terminal Specifics */
-        .terminal-body {
-            flex-grow: 1; padding: 10px; background: #1a1a1a;
-            color: #00ff00; font-family: monospace; overflow-y: auto;
-        }
-        #terminal-input {
-            background: transparent; border: none; color: white;
-            outline: none; width: 70%; font-family: inherit;
-        }
-
-        /* Explorer Specifics */
-        .explorer-body { flex-grow: 1; background: #fff; color: #333; display: flex; }
-        .sidebar { width: 140px; background: #f0f0f0; border-right: 1px solid #ccc; padding: 10px; }
-        .sidebar div { padding: 5px; cursor: pointer; border-radius: 3px; font-size: 14px; }
-        .sidebar div:hover { background: #ddd; }
-        .file-grid { flex-grow: 1; padding: 20px; display: grid; grid-template-columns: repeat(auto-fill, 80px); gap: 20px; }
-        .file-item { text-align: center; cursor: pointer; font-size: 12px; }
-        .file-icon { font-size: 30px; }
+        .term-body { flex-grow: 1; background: #000; color: #0f0; padding: 10px; font-family: monospace; overflow-y: auto; }
+        .expl-body { flex-grow: 1; background: #fff; color: #333; display: flex; }
+        .sidebar { width: 120px; background: #e0e0e0; padding: 10px; border-right: 1px solid #ccc; font-size: 14px; }
+        .file-view { flex-grow: 1; padding: 15px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        input { background: transparent; border: none; color: #0f0; outline: none; width: 80%; font-family: inherit; }
     </style>
 </head>
 <body>
 
 <div id="desktop">
-    <div class="icon" onclick="openWindow('terminal-window')">
-        <img src="https://flaticon.com">
-        <span>Terminal</span>
+    <div class="desktop-icon" onclick="openApp('explorer-win')">
+        <span class="icon-symbol">📁</span><span style="font-size:12px">Home</span>
     </div>
-    <div class="icon" onclick="openWindow('explorer-window')">
-        <img src="https://flaticon.com">
-        <span>Home</span>
+    <div class="desktop-icon" onclick="openApp('terminal-win')">
+        <span class="icon-symbol">🖥️</span><span style="font-size:12px">Terminal</span>
     </div>
 </div>
 
 <div id="panel">
-    <button id="start-menu-btn">LM</button>
-    <div id="clock" style="margin-left: auto; font-size: 12px; color: #aaa;"></div>
+    <button id="menu-btn">LM</button>
+    <div id="taskbar-icons" style="display:flex; gap:5px"></div>
+    <div id="clock" style="margin-left: auto; font-size: 12px;"></div>
 </div>
 
-<!-- TERMINAL -->
-<div id="terminal-window" class="window">
-    <div class="window-header" onmousedown="startDrag(event, 'terminal-window')">
-        <span>Terminal</span>
-        <button class="close-btn" onclick="closeWindow('terminal-window')">x</button>
+<!-- Terminal -->
+<div id="terminal-win" class="window">
+    <div class="window-header" onmousedown="dragStart(event, 'terminal-win')">
+        <span>Terminal</span><button class="close-btn" onclick="closeApp('terminal-win')">x</button>
     </div>
-    <div class="terminal-body" id="term-out">
-        <div>Welcome to Mint Web OS. Type 'help'.</div>
+    <div class="term-body" id="term-out">
+        <div>Type 'help' to start.</div>
         <div id="log"></div>
-        <span>mint@web:~$ </span><input type="text" id="terminal-input" autofocus>
+        <span>mint@web:~$ </span><input type="text" id="term-input" autofocus>
     </div>
 </div>
 
-<!-- EXPLORER -->
-<div id="explorer-window" class="window">
-    <div class="window-header" onmousedown="startDrag(event, 'explorer-window')">
-        <span>File Browser</span>
-        <button class="close-btn" onclick="closeWindow('explorer-window')">x</button>
+<!-- Explorer -->
+<div id="explorer-win" class="window">
+    <div class="window-header" onmousedown="dragStart(event, 'explorer-win')">
+        <span>File Explorer</span><button class="close-btn" onclick="closeApp('explorer-win')">x</button>
     </div>
-    <div class="explorer-body">
+    <div class="expl-body">
         <div class="sidebar">
-            <div onclick="renderFiles('Home')">Home</div>
-            <div onclick="renderFiles('Documents')">Documents</div>
-            <div onclick="renderFiles('Pictures')">Pictures</div>
+            <div onclick="renderDir('Home')">🏠 Home</div>
+            <div onclick="renderDir('Docs')">📄 Documents</div>
         </div>
-        <div class="file-grid" id="file-display"></div>
+        <div class="file-view" id="file-view"></div>
     </div>
 </div>
 
 <script>
-    /* --- ALL JAVASCRIPT LOGIC --- */
-    let activeWin = null;
-    let offset = { x: 0, y: 0 };
+    let dragWin = null; let offsetX, offsetY;
 
-    function openWindow(id) {
-        const win = document.getElementById(id);
-        win.style.display = 'flex';
-        win.style.zIndex = 100;
-        if(id === 'explorer-window') renderFiles('Home');
+    // Window Controls
+    function openApp(id) {
+        const w = document.getElementById(id);
+        w.style.display = 'flex';
+        w.style.zIndex = 100;
+        if(id === 'explorer-win') renderDir('Home');
     }
 
-    function closeWindow(id) {
-        document.getElementById(id).style.display = 'none';
-    }
+    function closeApp(id) { document.getElementById(id).style.display = 'none'; }
 
-    // Dragging Logic
-    function startDrag(e, id) {
-        activeWin = document.getElementById(id);
-        offset.x = e.clientX - activeWin.offsetLeft;
-        offset.y = e.clientY - activeWin.offsetTop;
-        document.querySelectorAll('.window').forEach(w => w.style.zIndex = 10);
-        activeWin.style.zIndex = 100;
+    function dragStart(e, id) {
+        dragWin = document.getElementById(id);
+        offsetX = e.clientX - dragWin.offsetLeft;
+        offsetY = e.clientY - dragWin.offsetTop;
+        document.querySelectorAll('.window').forEach(win => win.style.zIndex = 1);
+        dragWin.style.zIndex = 100;
     }
 
     window.onmousemove = (e) => {
-        if(activeWin) {
-            activeWin.style.left = (e.clientX - offset.x) + 'px';
-            activeWin.style.top = (e.clientY - offset.y) + 'px';
-        }
+        if(dragWin) { dragWin.style.left = (e.clientX - offsetX) + 'px'; dragWin.style.top = (e.clientY - offsetY) + 'px'; }
     }
+    window.onmouseup = () => dragWin = null;
 
-    window.onmouseup = () => activeWin = null;
-
-    // Terminal Logic
-    const termIn = document.getElementById('terminal-input');
-    const log = document.getElementById('log');
-    termIn.onkeydown = (e) => {
+    // Terminal Commands
+    const input = document.getElementById('term-input');
+    input.onkeydown = (e) => {
         if(e.key === 'Enter') {
-            const cmd = termIn.value.toLowerCase();
-            log.innerHTML += `<div>mint@web:~$ ${termIn.value}</div>`;
-            let res = "";
-            if(cmd === 'help') res = "Commands: help, clear, date, whoami";
+            const cmd = input.value.toLowerCase();
+            const log = document.getElementById('log');
+            log.innerHTML += `<div>mint@web:~$ ${input.value}</div>`;
+            if(cmd === 'help') log.innerHTML += "<div>Commands: clear, date, whoami</div>";
             else if(cmd === 'clear') log.innerHTML = "";
-            else if(cmd === 'date') res = new Date().toLocaleString();
-            else if(cmd === 'whoami') res = "mint-user";
-            else if(cmd !== "") res = "Command not found";
-            
-            log.innerHTML += `<div>${res}</div>`;
-            termIn.value = "";
-            document.getElementById('term-out').scrollTop = 9999;
+            else if(cmd === 'whoami') log.innerHTML += "<div>mint-user</div>";
+            input.value = "";
         }
     }
 
-    // File Logic
-    const fs = { 'Home':['Docs', 'Pics', 'read.txt'], 'Documents':['work.pdf'], 'Pictures':['vacation.jpg'] };
-    function renderFiles(f) {
-        const display = document.getElementById('file-display');
-        display.innerHTML = '';
-        (fs[f] || []).forEach(item => {
-            const isFile = item.includes('.');
-            display.innerHTML += `<div class="file-item" onclick="${!isFile ? `renderFiles('${item}')` : ''}">
-                <div class="file-icon">${isFile ? '📄' : '📁'}</div>${item}</div>`;
+    // Explorer Navigation
+    const fs = { 'Home': ['Documents', 'Downloads', 'todo.txt'], 'Docs': ['resume.pdf', 'code.js'] };
+    function renderDir(dir) {
+        const view = document.getElementById('file-view');
+        view.innerHTML = "";
+        (fs[dir] || []).forEach(f => {
+            const isFile = f.includes('.');
+            view.innerHTML += `<div style="text-align:center; cursor:pointer;" onclick="${!isFile ? `renderDir('Docs')` : ''}">
+                <div style="font-size:30px">${isFile ? '📄' : '📁'}</div><span style="font-size:11px">${f}</span></div>`;
         });
     }
 
-    // Clock
-    setInterval(() => {
-        document.getElementById('clock').innerText = new Date().toLocaleTimeString();
-    }, 1000);
+    setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString(); }, 1000);
 </script>
-
 </body>
+</html>
+
 </html>
 
