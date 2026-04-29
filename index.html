@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cinnamon Web OS</title>
+    <style>
+        /* Cinnamon Desktop Base */
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: 'Ubuntu', sans-serif;
+            overflow: hidden;
+            background: linear-gradient(135deg, #2c3e50, #000000); /* Mint-like dark gradient */
+            color: #fff;
+        }
+
+        /* Desktop Area */
+        #desktop {
+            height: calc(100vh - 40px);
+            position: relative;
+            padding: 20px;
+        }
+
+        .icon {
+            width: 80px;
+            text-align: center;
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .icon:hover { background: rgba(255, 255, 255, 0.1); }
+        .icon img { width: 48px; height: 48px; display: block; margin: 0 auto 5px; }
+
+        /* Bottom Panel (Cinnamon Style) */
+        #panel {
+            height: 40px;
+            background: rgba(45, 45, 45, 0.95);
+            border-top: 1px solid #444;
+            display: flex;
+            align-items: center;
+            padding: 0 10px;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+
+        #start-menu-btn {
+            background: #4ea84e; /* Mint green */
+            border: none;
+            padding: 5px 15px;
+            color: white;
+            font-weight: bold;
+            border-radius: 3px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+
+        /* Terminal Window */
+        .window {
+            position: absolute;
+            top: 50px;
+            left: 50px;
+            width: 600px;
+            height: 400px;
+            background: #2b2b2b;
+            border: 1px solid #555;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            display: none;
+            flex-direction: column;
+        }
+
+        .window-header {
+            background: #333;
+            padding: 5px 10px;
+            display: flex;
+            justify-content: space-between;
+            cursor: move;
+        }
+
+        .terminal-body {
+            flex-grow: 1;
+            padding: 10px;
+            font-family: 'Courier New', monospace;
+            overflow-y: auto;
+            background: #1a1a1a;
+            color: #00ff00;
+        }
+
+        #terminal-input {
+            background: transparent;
+            border: none;
+            color: white;
+            outline: none;
+            width: 80%;
+            font-family: inherit;
+        }
+    </style>
+</head>
+<body>
+
+<div id="desktop">
+    <div class="icon" onclick="toggleTerminal()">
+        <img src="https://flaticon.com" alt="Terminal">
+        <span>Terminal</span>
+    </div>
+</div>
+
+<!-- Bottom Panel -->
+<div id="panel">
+    <button id="start-menu-btn">LM</button>
+    <div id="taskbar"></div>
+</div>
+
+<!-- Terminal App -->
+<div id="terminal-window" class="window">
+    <div class="window-header">
+        <span>mint@web-os: ~</span>
+        <button onclick="toggleTerminal()" style="background:red; color:white; border:none; cursor:pointer;">X</button>
+    </div>
+    <div class="terminal-body" id="terminal-output">
+        <div>Welcome to Web-Mint Terminal. Type 'help' for commands.</div>
+        <div id="log"></div>
+        <span>mint@web-os:~$ </span><input type="text" id="terminal-input" autofocus>
+    </div>
+</div>
+
+<script>
+    const terminalWindow = document.getElementById('terminal-window');
+    const input = document.getElementById('terminal-input');
+    const log = document.getElementById('log');
+
+    // Toggle Window visibility
+    function toggleTerminal() {
+        terminalWindow.style.display = (terminalWindow.style.display === 'flex') ? 'none' : 'flex';
+        if(terminalWindow.style.display === 'flex') input.focus();
+    }
+
+    // Terminal Command Logic
+    input.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            const command = input.value.trim().toLowerCase();
+            const newLine = document.createElement('div');
+            newLine.innerHTML = `<span>mint@web-os:~$ ${input.value}</span>`;
+            log.appendChild(newLine);
+
+            const response = document.createElement('div');
+            switch(command) {
+                case 'help':
+                    response.innerHTML = "Available commands: help, clear, whoami, date";
+                    break;
+                case 'clear':
+                    log.innerHTML = '';
+                    break;
+                case 'whoami':
+                    response.innerHTML = "mint-user";
+                    break;
+                case 'date':
+                    response.innerHTML = new Date().toString();
+                    break;
+                case '':
+                    break;
+                default:
+                    response.innerHTML = `Command not found: ${command}`;
+            }
+            
+            log.appendChild(response);
+            input.value = '';
+            document.getElementById('terminal-output').scrollTop = document.getElementById('terminal-output').scrollHeight;
+        }
+    });
+
+    // Make window draggable (Simplified)
+    let isDragging = false;
+    const header = document.querySelector('.window-header');
+    header.onmousedown = () => isDragging = true;
+    window.onmouseup = () => isDragging = false;
+    window.onmousemove = (e) => {
+        if (isDragging) {
+            terminalWindow.style.left = e.clientX - 300 + 'px';
+            terminalWindow.style.top = e.clientY - 10 + 'px';
+        }
+    };
+</script>
+
+</body>
+</html>
