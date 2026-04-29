@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Web Mint OS v27.0 - Proxy & Store Edition</title>
+    <title>Web Mint OS v28.0 - Cloaked Edition</title>
     <style>
         * { box-sizing: border-box; }
         body { 
@@ -13,6 +13,8 @@
         #panel { position: fixed; bottom: 0; width: 100%; height: 45px; background: #23272e; display: flex; align-items: center; padding: 0 10px; border-top: 1px solid #444; z-index: 10000; }
         .p-btn { background: #4ea84e; color: white; border: none; padding: 6px 12px; cursor: pointer; margin-right: 8px; border-radius: 4px; font-weight: bold; }
         #clock { margin-left: auto; font-family: monospace; color: #aaa; }
+        
+        /* Window System */
         .win { position: absolute; width: 750px; height: 500px; background: #383c4a; display: none; flex-direction: column; border-radius: 6px; box-shadow: 0 15px 40px rgba(0,0,0,0.8); border: 1px solid #555; overflow: hidden; z-index: 100; }
         .hdr { background: #23272e; padding: 10px; display: flex; justify-content: space-between; align-items: center; cursor: grab; user-select: none; }
         .content { flex-grow: 1; display: flex; flex-direction: column; overflow: hidden; background: #fff; color: #000;}
@@ -23,11 +25,11 @@
         #term-hist { flex-grow: 1; overflow-y: auto; white-space: pre-wrap; font-size: 14px; }
         #term-in { background: transparent; color: #fff; border: none; outline: none; flex-grow: 1; font-family: inherit; font-size: 14px; }
 
-        /* Browser Header */
-        .browser-bar { background: #eee; padding: 10px; display: flex; gap: 8px; border-bottom: 1px solid #ccc; }
-        .browser-bar input { flex-grow: 1; padding: 5px; border-radius: 4px; border: 1px solid #bbb; }
+        /* Browser UI */
+        .browser-bar { background: #eee; padding: 10px; display: flex; gap: 8px; border-bottom: 1px solid #ccc; text-align: center; }
+        .browser-bar input { flex-grow: 1; padding: 8px; border: 1px solid #bbb; border-radius: 4px; }
 
-        /* App Store Style */
+        /* App Store */
         .store-item { padding: 15px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
         .install-btn { background: #2196F3; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; }
 
@@ -38,7 +40,6 @@
 <body>
 
 <div id="desktop">
-    <!-- DESKTOP ICONS -->
     <div class="icon" style="top: 20px; left: 20px;" onclick="openWin('t-win')"><span>🖥️</span>Terminal</div>
     <div class="icon" style="top: 130px; left: 20px;" onclick="openWin('e-win')"><span>📁</span>Files</div>
     <div class="icon" style="top: 240px; left: 20px;" onclick="openWin('b-win')"><span>🌐</span>Browser</div>
@@ -47,41 +48,33 @@
     <!-- TERMINAL -->
     <div id="t-win" class="win" style="top: 50px; left: 150px; width: 650px; height: 400px;">
         <div class="hdr"><span>🖥️ Terminal</span><button class="close-btn" onclick="closeWin('t-win')">X</button></div>
-        <div class="content" style="background:#000;">
-            <div id="term-box" onclick="document.getElementById('term-in').focus()">
-                <div id="term-hist">Web-Mint v27.0. Type 'help' for commands.</div>
-                <div style="display:flex"><span style="color:#4af626">mint@web:~$ &nbsp;</span><input type="text" id="term-in" spellcheck="false" autocomplete="off"></div>
-            </div>
-        </div>
+        <div class="content" style="background:#000;"><div id="term-box" onclick="document.getElementById('term-in').focus()"><div id="term-hist">Web-Mint v28.0 | Type 'help' for commands.</div><div style="display:flex"><span style="color:#4af626">mint@web:~$ &nbsp;</span><input type="text" id="term-in" spellcheck="false" autocomplete="off"></div></div></div>
     </div>
 
-    <!-- BROWSER (PROXIED - No more "Refused to Connect") -->
-    <div id="b-win" class="win" style="top: 80px; left: 300px; width: 900px; height: 600px;">
-        <div class="hdr"><span>🌐 Mint Browser (Stealth Proxy)</span><button class="close-btn" onclick="closeWin('b-win')">X</button></div>
-        <div class="content">
+    <!-- CLOAKED BROWSER -->
+    <div id="b-win" class="win" style="top: 80px; left: 300px; width: 600px; height: 350px;">
+        <div class="hdr"><span>🌐 Cloaked Browser Launcher</span><button class="close-btn" onclick="closeWin('b-win')">X</button></div>
+        <div class="content" style="padding: 20px; text-align: center;">
+            <h3>Cloaked Web Proxy</h3>
+            <p>Launches sites in an <b>about:blank</b> window to bypass security blocks.</p>
             <div class="browser-bar">
-                <input type="text" id="url-bar" value="wikipedia.org">
-                <button onclick="navProxy()">Go</button>
+                <input type="text" id="url-bar" value="google.com">
+                <button onclick="launchCloaked()" style="background:#4ea84e; color:white; border:none; padding:8px 15px; border-radius:4px; cursor:pointer;">Go</button>
             </div>
-            <!-- This proxy strips blocking headers -->
-            <iframe id="browser-frame" src="https://hypothes.is" style="width:100%; height:100%; border:none;"></iframe>
         </div>
     </div>
 
-    <!-- APP STORE (REAL STORE) -->
+    <!-- APP STORE -->
     <div id="a-win" class="win" style="top: 100px; left: 400px; width: 550px; height: 500px;">
-        <div class="hdr"><span>🛍️ Mint App Store</span><button class="close-btn" onclick="closeWin('a-win')">X</button></div>
+        <div class="hdr"><span>🛍️ Mint Store</span><button class="close-btn" onclick="closeWin('a-win')">X</button></div>
         <div class="content" style="overflow-y:auto; color:black; padding:10px;">
-            <h2 style="text-align:center; border-bottom: 2px solid #4ea84e; padding-bottom: 10px;">Official App Store</h2>
-            
             <div class="store-item">
-                <div><b>Cinnamon Update 1.2</b><br><small>Updates your theme and icons.</small></div>
-                <button class="install-btn" onclick="runStoreCode('<h1>System Updated!</h1><p>Restart recommended.</p>')">Install & Run</button>
+                <div><b>Cinnamon Refresh</b><br><small>Re-loads the main OS.</small></div>
+                <button class="install-btn" onclick="executeApp('<h1>OS Refreshed</h1>')">Run</button>
             </div>
-
             <div class="store-item">
-                <div><b>Snake Game</b><br><small>Classic arcade game for Mint.</small></div>
-                <button class="install-btn" onclick="runStoreCode('<h1>Snake Game</h1><p>Control with arrows...</p>')">Install & Run</button>
+                <div><b>Terminal Plus</b><br><small>Advanced terminal tools.</small></div>
+                <button class="install-btn" onclick="executeApp('<h1>Terminal+ Installed</h1>')">Run</button>
             </div>
         </div>
     </div>
@@ -89,10 +82,7 @@
     <!-- EXPLORER -->
     <div id="e-win" class="win" style="top: 150px; left: 100px; width: 450px;">
         <div class="hdr"><span>📁 Explorer</span><button class="close-btn" onclick="closeWin('e-win')">X</button></div>
-        <div class="content">
-            <div style="padding:10px; background:#f0f0f0;"><button onclick="createNewFile()">+ New File</button></div>
-            <div id="explorer-view" style="overflow-y:auto; color:black; height:100%;"></div>
-        </div>
+        <div class="content"><div style="padding:10px; background:#f0f0f0;"><button onclick="createNewFile()">+ New File</button></div><div id="explorer-view" style="overflow-y:auto; height:100%;"></div></div>
     </div>
 </div>
 
@@ -106,7 +96,7 @@
 
 <script>
     let highestZ = 1000;
-    let virtualFS = { "readme.txt": "Type 'help' in terminal. Use 'Install & Run' in store to change OS." };
+    let virtualFS = { "readme.txt": "Terminal: help, ls, neofetch, clear. Browser: about:blank mode." };
 
     function openWin(id) {
         const win = document.getElementById(id);
@@ -117,24 +107,37 @@
     function closeWin(id) { document.getElementById(id).style.display = 'none'; }
     setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString(); }, 1000);
 
-    // BROWSER PROXY LOGIC (Fixed blocks)
-    function navProxy() {
+    // ABOUT:BLANK CLOAKING LAUNCHER
+    function launchCloaked() {
         let val = document.getElementById('url-bar').value;
+        if(!val) return;
         if(!val.startsWith('http')) val = "https://" + val;
-        // via.hypothes.is is a robust proxy that allows almost all sites inside frames
-        document.getElementById('browser-frame').src = "https://hypothes.is" + val;
-    }
-
-    // RUN STORE APPS (Changes OS state)
-    function runStoreCode(code) {
-        if(confirm("This will execute app code and modify your session. Proceed?")) {
-            document.open();
-            document.write(code);
-            document.close();
+        
+        // The Cloaking Trick
+        let win = window.open('about:blank', '_blank');
+        if (win) {
+            win.document.body.style.margin = '0';
+            win.document.body.style.height = '100vh';
+            let iframe = win.document.createElement('iframe');
+            iframe.style.border = 'none';
+            iframe.style.width = '100%';
+            iframe.style.height = '100%';
+            iframe.style.margin = '0';
+            // Combining cloaking with the via proxy for maximum unblocking
+            iframe.src = "https://hypothes.is" + val;
+            win.document.body.appendChild(iframe);
+        } else {
+            alert("Please allow pop-ups for the cloaked browser to work!");
         }
     }
 
-    // TERMINAL COMMANDS (Restored)
+    function executeApp(code) {
+        if(confirm("Execute this app code?")) {
+            document.open(); document.write(code); document.close();
+        }
+    }
+
+    // TERMINAL LOGIC
     const tin = document.getElementById('term-in');
     const thist = document.getElementById('term-hist');
     tin.addEventListener('keydown', (e) => {
@@ -142,19 +145,11 @@
             const input = tin.value.trim();
             const cmd = input.toLowerCase();
             thist.innerHTML += `\nmint@web:~$ ${input}`;
-
-            if(cmd === 'help') {
-                thist.innerHTML += `\nCommands:\n- help: Commands list\n- ls: List files\n- neofetch: System Info\n- clear: Reset Screen`;
-            } else if(cmd === 'ls') {
-                thist.innerHTML += `\n${Object.keys(virtualFS).join('   ')}`;
-            } else if(cmd === 'neofetch') {
-                thist.innerHTML += `\n<b>Web Mint 27.0</b>\nKernel: Proxy-Frame-Core\nBrowser: Anti-Block Enabled`;
-            } else if(cmd === 'clear') {
-                thist.innerHTML = "Terminal cleared.";
-            } else if(input !== "") {
-                thist.innerHTML += `\n'${cmd}' is not a valid command. Type 'help'.`;
-            }
-
+            if(cmd === 'help') thist.innerHTML += `\nCommands: help, ls, neofetch, clear`;
+            else if(cmd === 'ls') thist.innerHTML += `\n${Object.keys(virtualFS).join('  ')}`;
+            else if(cmd === 'neofetch') thist.innerHTML += `\n<b>Web Mint 28.0</b>\nKernel: Cloaked-V8\nBrowser: about:blank-Proxy`;
+            else if(cmd === 'clear') thist.innerHTML = "Terminal cleared.";
+            else if(input !== "") thist.innerHTML += `\n'${cmd}' not found. Type 'help'.`;
             tin.value = "";
             thist.scrollTop = 9999;
         }
@@ -165,7 +160,7 @@
         view.innerHTML = "";
         for (let f in virtualFS) {
             const item = document.createElement('div');
-            item.style = "padding:12px; cursor:pointer; border-bottom:1px solid #ddd;";
+            item.style = "padding:12px; cursor:pointer; border-bottom:1px solid #ddd; color:black;";
             item.innerHTML = `📄 ${f}`;
             view.appendChild(item);
         }
@@ -181,7 +176,6 @@
             document.onmouseup = () => document.onmousemove = null;
         };
     });
-
     loadExplorer();
 </script>
 </body>
