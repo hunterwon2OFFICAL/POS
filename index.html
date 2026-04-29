@@ -1,117 +1,53 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Web Mint OS - Taskbar Edition</title>
+    <title>Web Mint - Cinnamon</title>
     <style>
-        body, html { margin: 0; padding: 0; height: 100%; font-family: sans-serif; overflow: hidden; background: #2f343f; color: white; }
+        body { background: #2f343f; color: white; font-family: sans-serif; margin: 0; padding: 0; }
+        #panel { position: fixed; bottom: 0; width: 100%; height: 45px; background: #23272e; display: flex; align-items: center; padding: 0 15px; border-top: 1px solid #444; }
+        .p-btn { background: #4ea84e; color: white; border: none; padding: 8px 15px; cursor: pointer; margin-right: 10px; border-radius: 4px; font-weight: bold; }
         
-        /* Desktop */
-        #desktop { height: calc(100vh - 45px); position: relative; padding: 20px; background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://wallhaven.cc'); background-size: cover; }
-
-        /* Panel / Taskbar */
-        #panel { height: 45px; background: #23272e; display: flex; align-items: center; padding: 0 10px; position: fixed; bottom: 0; width: 100%; border-top: 1px solid #444; z-index: 9999; }
+        /* The Windows */
+        .win { position: absolute; top: 10%; left: 10%; width: 450px; height: 300px; background: #383c4a; border: 1px solid #555; display: none; flex-direction: column; border-radius: 8px; box-shadow: 0 10px 30px black; }
+        .hdr { background: #23272e; padding: 10px; display: flex; justify-content: space-between; border-radius: 8px 8px 0 0; }
+        .content { padding: 20px; flex-grow: 1; }
         
-        .panel-btn { background: #4ea84e; border: none; padding: 8px 15px; color: white; border-radius: 4px; cursor: pointer; margin-right: 8px; font-weight: bold; }
-        .app-btn { background: #383c4a; border: 1px solid #555; }
-        .app-btn:hover { background: #4b5162; }
-
-        /* Windows */
-        .window { position: absolute; width: 500px; height: 350px; background: #383c4a; border: 1px solid #555; display: none; flex-direction: column; border-radius: 8px 8px 0 0; box-shadow: 0 10px 30px rgba(0,0,0,0.5); top: 100px; left: 100px; z-index: 100; }
-        .window-header { background: #23272e; padding: 10px; display: flex; justify-content: space-between; align-items: center; border-radius: 8px 8px 0 0; }
-        .close-btn { background: #e74c3c; border: none; color: white; border-radius: 50%; width: 20px; height: 20px; cursor: pointer; }
-
-        /* Content */
-        .content { flex-grow: 1; overflow: auto; padding: 15px; }
-        #term-log { color: #0f0; font-family: monospace; white-space: pre-wrap; }
-        #term-input { background: transparent; border: none; color: #0f0; outline: none; width: 80%; font-family: monospace; }
-        .file-item { background: white; color: #333; padding: 10px; margin-bottom: 5px; border-radius: 4px; display: flex; align-items: center; gap: 10px; }
+        /* Desktop text */
+        #msg { padding: 50px; text-align: center; font-size: 20px; }
     </style>
 </head>
 <body>
 
-<div id="desktop">
-    <p>Click the buttons at the bottom to open apps!</p>
-</div>
-
-<div id="panel">
-    <button class="panel-btn">LM</button>
-    <!-- Use these buttons if the desktop icons fail -->
-    <button class="panel-btn app-btn" onclick="openApp('terminal')">🖥️ Terminal</button>
-    <button class="panel-btn app-btn" onclick="openApp('explorer')">📁 Explorer</button>
-    <div id="clock" style="margin-left: auto;"></div>
-</div>
-
-<!-- Terminal Window -->
-<div id="terminal" class="window">
-    <div class="window-header">
-        <span>Terminal</span>
-        <button class="close-btn" onclick="closeApp('terminal')">x</button>
+    <div id="msg">
+        <h1>Linux Mint Web OS</h1>
+        <p>If you see the buttons at the bottom, click them!</p>
     </div>
-    <div class="content" style="background: black;">
-        <div id="term-log">Welcome to Mint. Type 'help' below.</div>
-        <span>mint@web:~$ </span><input type="text" id="term-input" autofocus>
+
+    <!-- Taskbar -->
+    <div id="panel">
+        <button class="p-btn" onclick="document.getElementById('t-win').style.display='flex'">🖥️ Terminal</button>
+        <button class="p-btn" onclick="document.getElementById('e-win').style.display='flex'">📁 Explorer</button>
     </div>
-</div>
 
-<!-- Explorer Window -->
-<div id="explorer" class="window">
-    <div class="window-header">
-        <span>File Explorer</span>
-        <button class="close-btn" onclick="closeApp('explorer')">x</button>
+    <!-- Terminal -->
+    <div id="t-win" class="win">
+        <div class="hdr"><span>Terminal</span><button onclick="this.parentElement.parentElement.style.display='none'">X</button></div>
+        <div class="content" style="background:black; color:lime; font-family:monospace;">
+            Welcome. Terminal is running!<br><br>
+            mint@web:~$ _
+        </div>
     </div>
-    <div class="content" style="background: #f0f0f0;">
-        <div class="file-item">📁 Documents</div>
-        <div class="file-item">📁 Pictures</div>
-        <div class="file-item">📄 README.txt</div>
+
+    <!-- Explorer -->
+    <div id="e-win" class="win">
+        <div class="hdr"><span>File Explorer</span><button onclick="this.parentElement.parentElement.style.display='none'">X</button></div>
+        <div class="content" style="background:white; color:black;">
+            <b>Home Folder</b><br><hr>
+            📁 Documents<br>
+            📁 Downloads<br>
+            📄 readme.txt
+        </div>
     </div>
-</div>
-
-<script>
-    // Open Windows
-    function openApp(id) {
-        document.getElementById(id).style.display = 'flex';
-        // Bring clicked window to front
-        document.getElementById('terminal').style.zIndex = "100";
-        document.getElementById('explorer').style.zIndex = "100";
-        document.getElementById(id).style.zIndex = "200";
-        
-        if(id === 'terminal') document.getElementById('term-input').focus();
-    }
-
-    // Close Windows
-    function closeApp(id) {
-        document.getElementById(id).style.display = 'none';
-    }
-
-    // Terminal Logic
-    const termInput = document.getElementById('term-input');
-    const termLog = document.getElementById('term-log');
-
-    termInput.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter') {
-            const cmd = termInput.value.toLowerCase().trim();
-            termLog.innerHTML += `\nmint@web:~$ ${termInput.value}`;
-            
-            if (cmd === 'help') termLog.innerHTML += `\nCommands: help, date, clear, whoami`;
-            else if (cmd === 'date') termLog.innerHTML += `\n${new Date().toLocaleString()}`;
-            else if (cmd === 'whoami') termLog.innerHTML += `\nmint-user`;
-            else if (cmd === 'clear') termLog.innerHTML = `Welcome to Mint.`;
-            else if (cmd !== "") termLog.innerHTML += `\nCommand not found: ${cmd}`;
-            
-            termInput.value = '';
-            // Scroll to bottom
-            const content = termInput.parentElement;
-            content.scrollTop = content.scrollHeight;
-        }
-    });
-
-    // Simple Clock
-    setInterval(() => {
-        document.getElementById('clock').innerText = new Date().toLocaleTimeString();
-    }, 1000);
-</script>
 
 </body>
 </html>
-
