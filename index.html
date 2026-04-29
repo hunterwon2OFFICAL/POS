@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Web Mint OS v17.0 - GitHub Sync</title>
+    <title>Web Mint OS v18.0 - Proxy Master</title>
     <style>
         * { box-sizing: border-box; }
         body { 
@@ -22,7 +22,6 @@
         #term-in { background: transparent; color: #fff; border: none; outline: none; flex-grow: 1; font-family: inherit; font-size: 14px; }
         .settings-item { padding: 15px; border-bottom: 1px solid #eee; color: black; display: flex; flex-direction: column; gap: 5px; }
         .icon { position: absolute; width: 90px; text-align: center; cursor: pointer; padding: 10px; color: white; text-shadow: 1px 1px 4px black; }
-        .icon:hover { background: rgba(255,255,255,0.1); border-radius: 8px; }
         .icon span { font-size: 32px; display: block; margin-bottom: 5px; }
     </style>
 </head>
@@ -34,40 +33,36 @@
     <div class="icon" style="top: 240px; left: 20px;" onclick="openWin('b-win')"><span>🌐</span>Browser</div>
     <div class="icon" style="top: 350px; left: 20px;" onclick="openWin('s-win')"><span>⚙️</span>Settings</div>
 
-    <!-- TERMINAL -->
     <div id="t-win" class="win" style="top: 50px; left: 150px; width: 650px; height: 400px;">
         <div class="hdr"><span>🖥️ Terminal</span><button class="close-btn" onclick="closeWin('t-win')">X</button></div>
         <div class="content" style="background:#000;">
             <div id="term-box" onclick="document.getElementById('term-in').focus()">
-                <div id="term-hist">Web-Mint v17.0 | Auto-Update Enabled.</div>
+                <div id="term-hist">Web-Mint v18.0 | New Commands: echo, pwd, mkdir, cat</div>
                 <div style="display:flex"><span>mint@web:~$ &nbsp;</span><input type="text" id="term-in" spellcheck="false" autocomplete="off"></div>
             </div>
         </div>
     </div>
 
-    <!-- BROWSER -->
-    <div id="b-win" class="win" style="top: 80px; left: 300px; width: 850px; height: 550px;">
-        <div class="hdr"><span>🌐 Browser</span><button class="close-btn" onclick="closeWin('b-win')">X</button></div>
+    <div id="b-win" class="win" style="top: 80px; left: 300px; width: 900px; height: 600px;">
+        <div class="hdr"><span>🌐 MintBrowser (Proxy Mode)</span><button class="close-btn" onclick="closeWin('b-win')">X</button></div>
         <div class="content">
             <div style="background:#eee; padding:10px; display:flex; gap:8px;">
-                <input type="text" id="url-input" style="flex-grow:1; padding:5px;" placeholder="URL...">
+                <input type="text" id="url-input" style="flex-grow:1; padding:5px;" placeholder="Search Google or type URL...">
                 <button onclick="navBrowser()">Go</button>
             </div>
-            <iframe id="browser-frame" src="https://hypothes.is"></iframe>
+            <iframe id="browser-frame" src="https://google.com" style="width:100%; height:100%; border:none;"></iframe>
         </div>
     </div>
 
-    <!-- SETTINGS -->
     <div id="s-win" class="win" style="top: 150px; left: 400px; width: 450px; height: 450px;">
         <div class="hdr"><span>⚙️ Settings</span><button class="close-btn" onclick="closeWin('s-win')">X</button></div>
         <div class="content" style="overflow-y:auto;">
-            <div class="settings-item"><b>GitHub Auto-Update URL</b><input type="text" id="gh-url" placeholder="://githubusercontent.com..."><button onclick="startAutoUpdate()">Enable Sync</button></div>
-            <div class="settings-item"><b>Background URL</b><input type="text" id="bg-input"><button onclick="document.body.style.backgroundImage = 'url('+document.getElementById('bg-input').value+')'">Apply</button></div>
+            <div class="settings-item"><b>GitHub Auto-Update URL</b><input type="text" id="gh-url" placeholder="Paste ://githubusercontent.com link here..."><button onclick="startAutoUpdate()">Enable Auto-Update</button></div>
+            <div class="settings-item"><b>Background URL</b><input type="text" id="bg-input"><button onclick="document.body.style.backgroundImage = 'url('+document.getElementById('bg-input').value+')'">Apply Wallpaper</button></div>
             <div class="settings-item"><b>Panel Color</b><input type="color" onchange="document.getElementById('panel').style.background = this.value"></div>
         </div>
     </div>
 
-    <!-- EXPLORER -->
     <div id="e-win" class="win" style="top: 100px; left: 100px; width: 450px;"><div class="hdr"><span>📁 Explorer</span><button class="close-btn" onclick="closeWin('e-win')">X</button></div><div class="content"><div style="padding:10px; background:#f0f0f0;"><button onclick="createNewFile()">+ New File</button></div><div id="explorer-view" style="overflow-y:auto; color:black; height:100%;"></div></div></div>
 </div>
 
@@ -75,12 +70,13 @@
     <button class="p-btn" style="background:#2ecc71" onclick="openWin('t-win')">Terminal</button>
     <button class="p-btn" onclick="openWin('e-win')">Files</button>
     <button class="p-btn" onclick="openWin('b-win')">Browser</button>
+    <button class="p-btn" onclick="openWin('s-win')">Settings</button>
     <div id="clock">00:00:00</div>
 </div>
 
 <script>
     let highestZ = 1000;
-    let virtualFS = { "readme.txt": "Auto-update enabled in Settings." };
+    let virtualFS = { "readme.txt": "Terminal: Try 'echo hello', 'mkdir project', or 'pwd'." };
     let lastCode = "";
 
     function openWin(id) {
@@ -91,48 +87,44 @@
     }
     function closeWin(id) { document.getElementById(id).style.display = 'none'; }
 
-    // AUTO UPDATE ENGINE
+    setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString(); }, 1000);
+
+    function navBrowser() {
+        let val = document.getElementById('url-input').value;
+        let url = val.includes('.') ? (val.startsWith('http') ? val : 'https://' + val) : 'https://google.com' + encodeURIComponent(val) + '&igu=1';
+        document.getElementById('browser-frame').src = url;
+    }
+
     async function checkUpdates() {
         const url = document.getElementById('gh-url').value;
         if (!url) return;
         try {
             const response = await fetch(url + '?t=' + Date.now());
             const code = await response.text();
-            if (lastCode && code !== lastCode) {
-                console.log("Update found! Reloading OS...");
-                document.open(); document.write(code); document.close();
-            }
+            if (lastCode && code !== lastCode) { document.open(); document.write(code); document.close(); }
             lastCode = code;
-        } catch (e) { console.error("Update failed", e); }
+        } catch (e) { console.error("Update check failed."); }
     }
 
     function startAutoUpdate() {
-        alert("Auto-update started. Checking every 30s.");
+        alert("GitHub Sync Started!");
         setInterval(checkUpdates, 30000);
     }
 
-    setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString(); }, 1000);
-
-    function navBrowser() {
-        let val = document.getElementById('url-input').value;
-        if(!val.includes('.')) val = "https://brave.com" + encodeURIComponent(val);
-        else if(!val.startsWith('http')) val = "https://" + val;
-        document.getElementById('browser-frame').src = "https://hypothes.is" + val;
-    }
-
-    // Terminal
     const tin = document.getElementById('term-in');
     const thist = document.getElementById('term-hist');
     tin.addEventListener('keydown', (e) => {
         if(e.key === 'Enter') {
             const input = tin.value.trim();
-            const cmd = input.split(' ').toLowerCase();
-            const arg = input.split(' ');
+            const args = input.split(' ');
+            const cmd = args[0].toLowerCase();
             thist.innerHTML += `\nmint@web:~$ ${input}`;
             if(cmd === 'ls') thist.innerHTML += `\n${Object.keys(virtualFS).join('  ')}`;
-            else if(cmd === 'touch') { virtualFS[arg] = ""; loadExplorer(); thist.innerHTML += "\nCreated."; }
+            else if(cmd === 'echo') thist.innerHTML += `\n${args.slice(1).join(' ')}`;
+            else if(cmd === 'pwd') thist.innerHTML += `\n/home/mint/desktop`;
+            else if(cmd === 'mkdir') { virtualFS[args[1] + "/"] = ""; loadExplorer(); thist.innerHTML += `\nCreated folder: ${args[1]}`; }
+            else if(cmd === 'neofetch') thist.innerHTML += `\n<b>Web Mint 18.0</b>\nBrowser: Proxy-Enabled\nUpdate: GitHub-Sync`;
             else if(cmd === 'clear') thist.innerHTML = "Terminal cleared.";
-            else if(cmd === 'neofetch') thist.innerHTML += `\n<b>Web Mint 17.0</b>\nUpdate Mode: GitHub Sync`;
             else if(input !== "") thist.innerHTML += `\nCommand not found.`;
             tin.value = "";
             thist.scrollTop = 9999;
