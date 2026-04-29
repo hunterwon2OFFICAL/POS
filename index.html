@@ -2,11 +2,11 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Web Mint OS v6.0</title>
+    <title>Web Mint OS v7.0</title>
     <style>
         * { box-sizing: border-box; }
         body { 
-            /* I put your exact file path here. If it doesn't show, you may need to host it or use a web link */
+            /* Background Path */
             background: #2f343f url('file:///home/chronos/u-9d5c7590003e20250841f4563cdf3e21441a4aa8/MyFiles/Downloads/Screenshot%202026-04-28%2011.01.03%20PM.png') center/cover no-repeat fixed; 
             color: white; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; overflow: hidden; height: 100vh;
         }
@@ -21,7 +21,6 @@
         }
 
         .p-btn { background: #4ea84e; color: white; border: none; padding: 6px 15px; cursor: pointer; margin-right: 8px; border-radius: 4px; font-weight: bold; }
-        .p-btn:hover { background: #5cb85c; }
 
         /* Windows */
         .win { position: absolute; width: 650px; height: 450px; background: #383c4a; display: none; flex-direction: column; border-radius: 6px; box-shadow: 0 15px 40px rgba(0,0,0,0.8); border: 1px solid #555; }
@@ -29,57 +28,75 @@
         .content { flex-grow: 1; display: flex; flex-direction: column; overflow: hidden; background: #fff; color: #000;}
         .close-btn { background: #e74c3c; color: white; border: none; border-radius: 3px; cursor: pointer; padding: 2px 10px; }
 
-        /* Browser Fix */
-        .browser-bar { background: #eee; padding: 8px; display: flex; gap: 5px; border-bottom: 1px solid #ccc; }
-        .browser-bar input { flex-grow: 1; border: 1px solid #bbb; padding: 5px; border-radius: 4px; }
-        iframe { width: 100%; flex-grow: 1; border: none; background: white; }
+        /* Terminal Style */
+        #term-box { background: #000; color: #4af626; height: 100%; display: flex; flex-direction: column; padding: 10px; font-family: monospace; }
+        #term-history { flex-grow: 1; overflow-y: auto; white-space: pre-wrap; }
+        #term-input { background: transparent; color: #4af626; border: none; outline: none; width: 80%; font-family: inherit; }
 
         /* File Explorer */
-        .toolbar { background: #f0f0f0; padding: 8px; border-bottom: 1px solid #ccc; display: flex; gap: 10px; }
+        .toolbar { background: #f0f0f0; padding: 8px; border-bottom: 1px solid #ccc; }
         .file-item { padding: 12px; cursor: pointer; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #eee; }
         .file-item:hover { background: #e8f5e9; }
-        #editor-area { width: 100%; height: 100%; padding: 15px; border: none; resize: none; font-size: 16px; outline: none; }
+        
+        /* Desktop Icons */
+        .icon { position: absolute; width: 80px; text-align: center; cursor: pointer; color: white; text-shadow: 1px 1px 2px black; padding: 10px; border-radius: 5px; }
+        .icon:hover { background: rgba(255,255,255,0.1); }
+        .icon span { font-size: 30px; display: block; }
     </style>
 </head>
 <body>
 
 <div id="desktop">
+    <!-- Desktop Icons -->
+    <div class="icon" style="top: 20px; left: 20px;" onclick="openWin('t-win')"><span>🖥️</span>Terminal</div>
+    <div class="icon" style="top: 120px; left: 20px;" onclick="openWin('e-win')"><span>📁</span>Files</div>
+    <div class="icon" style="top: 220px; left: 20px;" onclick="openWin('b-win')"><span>🌐</span>Browser</div>
+
+    <!-- Terminal -->
+    <div id="t-win" class="win" style="top: 50px; left: 150px;">
+        <div class="hdr"><span>🖥️ Terminal</span><button class="close-btn" onclick="closeWin('t-win')">X</button></div>
+        <div class="content" style="background:#000;">
+            <div id="term-box" onclick="document.getElementById('term-input').focus()">
+                <div id="term-history">Web-Mint Terminal restored!&#10;Type 'help' for commands.</div>
+                <div style="display:flex"><span>mint@web:~$</span><input type="text" id="term-input" spellcheck="false" autocomplete="off"></div>
+            </div>
+        </div>
+    </div>
+
     <!-- Browser -->
-    <div id="b-win" class="win" style="top: 50px; left: 300px; width: 850px; height: 550px;">
+    <div id="b-win" class="win" style="top: 80px; left: 350px; width: 800px; height: 500px;">
         <div class="hdr"><span>🌐 Web Browser</span><button class="close-btn" onclick="closeWin('b-win')">X</button></div>
         <div class="content">
-            <div class="browser-bar">
-                <input type="text" id="url-bar" placeholder="Search or enter URL (e.g. duckduckgo.com)">
-                <button onclick="goUrl()">Search/Go</button>
+            <div style="background:#eee; padding:5px; display:flex; gap:5px;">
+                <input type="text" id="url-bar" style="flex-grow:1" value="duckduckgo.com">
+                <button onclick="goUrl()">Go</button>
             </div>
-            <!-- Using a search engine that often allows iframes -->
             <iframe id="browser-frame" src="https://duckduckgo.com"></iframe>
         </div>
     </div>
 
     <!-- Explorer -->
-    <div id="e-win" class="win" style="top: 150px; left: 80px;">
+    <div id="e-win" class="win" style="top: 150px; left: 100px;">
         <div class="hdr"><span>📁 Explorer</span><button class="close-btn" onclick="closeWin('e-win')">X</button></div>
         <div class="content">
-            <div class="toolbar">
-                <button onclick="createNewFile()">➕ New File</button>
-            </div>
+            <div class="toolbar"><button onclick="createNewFile()">➕ New File</button></div>
             <div id="explorer-view" style="overflow-y:auto;"></div>
         </div>
     </div>
 
     <!-- Notepad -->
-    <div id="n-win" class="win" style="top: 100px; left: 450px; width: 500px; height: 400px;">
+    <div id="n-win" class="win" style="top: 120px; left: 450px; width: 500px; height: 400px;">
         <div class="hdr"><span id="note-title">📄 Notepad</span><button class="close-btn" onclick="closeWin('n-win')">X</button></div>
         <div class="content">
-            <textarea id="editor-area"></textarea>
+            <textarea id="editor-area" style="width:100%; height:100%; border:none; padding:10px; outline:none;"></textarea>
             <div style="background:#ddd; padding:5px; text-align:right;"><button onclick="saveFile()">💾 Save</button></div>
         </div>
     </div>
 </div>
 
 <div id="panel">
-    <button class="p-btn" style="background:#2ecc71" onclick="openWin('e-win')">LM</button>
+    <button class="p-btn" style="background:#2ecc71">LM</button>
+    <button class="p-btn" onclick="openWin('t-win')">Terminal</button>
     <button class="p-btn" onclick="openWin('e-win')">Files</button>
     <button class="p-btn" onclick="openWin('b-win')">Browser</button>
 </div>
@@ -87,12 +104,13 @@
 <script>
     let highestZ = 100;
     let currentFile = "";
-    let virtualFS = { "readme.txt": "Welcome to Version 6.0!" };
+    let virtualFS = { "readme.txt": "Terminal is back! Try 'neofetch'." };
 
     function openWin(id) {
         const win = document.getElementById(id);
         win.style.display = 'flex';
         focusWin(win);
+        if(id === 't-win') document.getElementById('term-input').focus();
     }
     function closeWin(id) { document.getElementById(id).style.display = 'none'; }
     function focusWin(win) { win.style.zIndex = ++highestZ; }
@@ -109,44 +127,44 @@
             view.appendChild(item);
         }
     }
-
     function createNewFile() {
-        const name = prompt("Enter file name (e.g. text.txt):");
-        if(name) {
-            virtualFS[name] = "";
-            loadExplorer();
-        }
+        const name = prompt("File name:");
+        if(name) { virtualFS[name] = ""; loadExplorer(); }
     }
-
     function openFile(name) {
         currentFile = name;
         document.getElementById('note-title').innerText = name;
         document.getElementById('editor-area').value = virtualFS[name];
         openWin('n-win');
     }
-
     function saveFile() {
-        if(currentFile) {
-            virtualFS[currentFile] = document.getElementById('editor-area').value;
-            alert("Saved!");
-        }
+        if(currentFile) { virtualFS[currentFile] = document.getElementById('editor-area').value; alert("Saved!"); }
     }
 
-    // BROWSER
+    // TERMINAL LOGIC
+    const tin = document.getElementById('term-input');
+    const thist = document.getElementById('term-history');
+    tin.addEventListener('keydown', (e) => {
+        if(e.key === 'Enter') {
+            const val = tin.value.trim();
+            const cmd = val.toLowerCase();
+            thist.innerHTML += `\nmint@web:~$ ${val}`;
+            if(cmd === 'ls') thist.innerHTML += `\n${Object.keys(virtualFS).join('  ')}`;
+            else if(cmd === 'neofetch') thist.innerHTML += `\n<b>Mint Web v7.0</b>\nKernel: JavaScript-Core\nShell: Bash-Emulation`;
+            else if(cmd === 'clear') thist.innerHTML = "Terminal cleared.";
+            else if(val !== "") thist.innerHTML += `\n'${val}' not recognized.`;
+            tin.value = "";
+            document.getElementById('term-box').scrollTop = 9999;
+        }
+    });
+
     function goUrl() {
-        let val = document.getElementById('url-bar').value;
-        let target = document.getElementById('browser-frame');
-        
-        if(!val.includes('.')) {
-            // If it's not a URL, search for it
-            target.src = "https://duckduckgo.com" + encodeURIComponent(val);
-        } else {
-            if(!val.startsWith('http')) val = 'https://' + val;
-            target.src = val;
-        }
+        let url = document.getElementById('url-bar').value;
+        if(!url.includes('://')) url = 'https://' + url;
+        document.getElementById('browser-frame').src = url;
     }
 
-    // DRAG
+    // DRAGGING
     document.querySelectorAll('.win').forEach(win => {
         const header = win.querySelector('.hdr');
         header.onmousedown = function(e) {
@@ -159,6 +177,7 @@
             };
             document.onmouseup = () => document.onmousemove = null;
         };
+        win.onmousedown = () => focusWin(win);
     });
 
     loadExplorer();
