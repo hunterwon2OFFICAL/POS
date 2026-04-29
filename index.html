@@ -2,25 +2,23 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Web Mint OS - Cinnamon v2.1</title>
+    <title>Web Mint - Fixed Browser & Terminal</title>
     <style>
         * { box-sizing: border-box; }
         body { 
             background: #2f343f; color: white; font-family: 'Segoe UI', sans-serif; 
             margin: 0; padding: 0; overflow: hidden; height: 100vh;
+            /* Improved background source */
+            background: #1a1c22 url('https://pexels.com') center/cover;
         }
 
-        #desktop { 
-            width: 100%; height: calc(100vh - 45px); position: relative;
-            /* Using a reliable placeholder background */
-            background: #1a1c22 url('https://unsplash.com') center/cover;
-        }
+        #desktop { width: 100%; height: calc(100vh - 45px); position: relative; }
 
         /* Taskbar */
         #panel { 
             position: fixed; bottom: 0; width: 100%; height: 45px; 
-            background: rgba(35, 39, 46, 0.95); display: flex; align-items: center; 
-            padding: 0 10px; border-top: 1px solid #444; z-index: 9999; backdrop-filter: blur(5px);
+            background: rgba(35, 39, 46, 0.9); display: flex; align-items: center; 
+            padding: 0 10px; border-top: 1px solid #444; z-index: 9999; backdrop-filter: blur(8px);
         }
 
         .p-btn { 
@@ -41,24 +39,24 @@
             border-radius: 6px 6px 0 0; cursor: grab; user-select: none;
         }
 
-        .content { flex-grow: 1; display: flex; flex-direction: column; overflow: hidden; background: #f5f5f5; color: #000;}
+        .content { flex-grow: 1; display: flex; flex-direction: column; overflow: hidden; background: #fff; color: #000;}
         .close-btn { background: #e74c3c; color: white; border: none; border-radius: 3px; cursor: pointer; padding: 2px 10px; }
 
-        /* Terminal Style */
+        /* Terminal Fix */
         #term-box { 
             background: #000; color: #4af626; height: 100%; 
             display: flex; flex-direction: column; padding: 12px; 
             font-family: 'Consolas', monospace; font-size: 14px;
         }
         #term-history { flex-grow: 1; overflow-y: auto; white-space: pre-wrap; }
-        .term-line { display: flex; align-items: center; margin-top: 5px; }
+        .term-line { display: flex; align-items: center; margin-top: 5px; flex-shrink: 0; }
         #term-input { 
             background: transparent; color: #4af626; border: none; 
             outline: none; flex-grow: 1; font-family: inherit; font-size: inherit;
         }
 
         /* Browser Header */
-        .browser-header { background: #ddd; padding: 5px; display: flex; gap: 5px; border-bottom: 1px solid #aaa; }
+        .browser-header { background: #ddd; padding: 5px; display: flex; gap: 5px; border-bottom: 1px solid #aaa; flex-shrink: 0; }
         .browser-header input { flex-grow: 1; border: 1px solid #bbb; padding: 4px; border-radius: 3px; }
         iframe { width: 100%; flex-grow: 1; border: none; background: white; }
 
@@ -70,52 +68,50 @@
 <body>
 
 <div id="desktop">
-    <!-- Terminal Window -->
+    <!-- Terminal -->
     <div id="t-win" class="win" style="top: 20px; left: 20px;">
         <div class="hdr"><span>🖥️ Terminal</span><button class="close-btn" onclick="closeWin('t-win')">X</button></div>
         <div class="content" style="background:#000;">
             <div id="term-box" onclick="document.getElementById('term-input').focus()">
-                <div id="term-history">Web-Mint Linux [Version 1.0.5]&#10;Type 'help' for commands.</div>
+                <div id="term-history">Web-Mint v2.2 (Cinnamon)&#10;Type 'help' for commands.</div>
                 <div class="term-line"><span>mint@web:~$</span><input type="text" id="term-input" spellcheck="false" autocomplete="off"></div>
             </div>
         </div>
     </div>
 
-    <!-- Browser Window -->
+    <!-- Browser -->
     <div id="b-win" class="win" style="top: 50px; left: 300px; width: 800px; height: 550px;">
-        <div class="hdr"><span>🌐 Web Browser</span><button class="close-btn" onclick="closeWin('b-win')">X</button></div>
+        <div class="hdr"><span>🌐 Browser</span><button class="close-btn" onclick="closeWin('b-win')">X</button></div>
         <div class="content">
             <div class="browser-header">
-                <input type="text" id="url-bar" value="https://bing.com">
+                <input type="text" id="url-bar" value="https://duckduckgo.com">
                 <button onclick="loadUrl()">Go</button>
             </div>
-            <iframe id="browser-frame" src="https://bing.com"></iframe>
+            <!-- Using DuckDuckGo which allows iframes -->
+            <iframe id="browser-frame" src="https://duckduckgo.com"></iframe>
         </div>
     </div>
 
-    <!-- Explorer Window -->
+    <!-- Explorer -->
     <div id="e-win" class="win" style="top: 150px; left: 80px;">
         <div class="hdr"><span>📁 Explorer</span><button class="close-btn" onclick="closeWin('e-win')">X</button></div>
         <div class="content">
-            <div id="exp-path" style="padding:10px; font-weight:bold; border-bottom:1px solid #ccc;">Home > <span id="cur-folder">Documents</span></div>
-            <div id="file-list" style="overflow-y:auto;"></div>
+            <div style="padding:10px; font-weight:bold; border-bottom:1px solid #ccc; background:#eee;">Home > <span id="cur-folder">Documents</span></div>
+            <div id="file-list" style="overflow-y:auto; background:white;"></div>
         </div>
     </div>
 </div>
 
 <div id="panel">
-    <button class="p-btn" style="background:#2ecc71" onclick="alert('Mint Menu')">LM</button>
+    <button class="p-btn" style="background:#2ecc71">LM</button>
     <button class="p-btn" onclick="openWin('t-win')">Terminal</button>
-    <button class="p-btn" onclick="openWin('e-win'); switchFolder('Documents')">Files</button>
+    <button class="p-btn" onclick="openWin('e-win'); renderFiles('Documents')">Files</button>
     <button class="p-btn" onclick="openWin('b-win')">Browser</button>
 </div>
 
 <script>
     let highestZ = 100;
-    const folderData = {
-        'Documents': ['readme.txt', 'project_code.js', 'notes.txt'],
-        'Downloads': ['mint-os.iso', 'profile_pic.png']
-    };
+    let fs = { 'Documents': ['readme.txt', 'script.js'], 'Downloads': ['linux-mint.iso'] };
 
     function openWin(id) {
         const win = document.getElementById(id);
@@ -131,45 +127,35 @@
         win.style.zIndex = highestZ;
     }
 
-    // EXPLORER LOGIC
-    function switchFolder(name) {
-        document.getElementById('cur-folder').innerText = name;
+    // EXPLORER
+    function renderFiles(folder) {
+        document.getElementById('cur-folder').innerText = folder;
         const list = document.getElementById('file-list');
         list.innerHTML = "";
         
-        // Add navigation
-        if(name === 'Downloads') {
-            list.innerHTML += `<div class="file-item" onclick="switchFolder('Documents')">🔙 Back to Documents</div>`;
-        } else {
-            list.innerHTML += `<div class="file-item" onclick="switchFolder('Downloads')">📁 Downloads</div>`;
-        }
+        if(folder === 'Downloads') list.innerHTML += `<div class="file-item" onclick="renderFiles('Documents')">🔙 Back</div>`;
+        else list.innerHTML += `<div class="file-item" onclick="renderFiles('Downloads')">📁 Downloads</div>`;
 
-        folderData[name].forEach(file => {
-            list.innerHTML += `<div class="file-item" onclick="alert('Opening ${file}...')">📄 ${file}</div>`;
-        });
+        fs[folder].forEach(f => list.innerHTML += `<div class="file-item">📄 ${f}</div>`);
     }
 
-    // BROWSER LOGIC
-    function loadUrl() {
-        let url = document.getElementById('url-bar').value;
-        if(!url.startsWith('http')) url = 'https://' + url;
-        document.getElementById('browser-frame').src = url;
-    }
-
-    // TERMINAL LOGIC
+    // TERMINAL COMMANDS
     const tin = document.getElementById('term-input');
     const thist = document.getElementById('term-history');
 
     tin.addEventListener('keydown', (e) => {
         if(e.key === 'Enter') {
             const val = tin.value.trim();
-            const cmd = val.toLowerCase();
+            const args = val.split(' ');
+            const cmd = args[0].toLowerCase();
             thist.innerHTML += `\nmint@web:~$ ${val}`;
             
-            if(cmd === 'help') thist.innerHTML += "\n- ls, clear, whoami, neofetch, date, browser";
+            if(cmd === 'help') thist.innerHTML += "\n- ls, clear, neofetch, mkdir, rm, browser";
             else if(cmd === 'ls') thist.innerHTML += "\nDocuments/  Downloads/  readme.txt";
             else if(cmd === 'clear') thist.innerHTML = "Terminal cleared.";
-            else if(cmd === 'neofetch') thist.innerHTML += "\n<b>OS</b>: Web Mint 2.1\n<b>Kernel</b>: Cinnamon-JS\n<b>Theme</b>: Mint-Y-Dark";
+            else if(cmd === 'neofetch') thist.innerHTML += "\n<b>OS</b>: Web-Mint 2.2\n<b>Shell</b>: JS-Bash\n<b>Browser</b>: DuckDuckGo-Enforced";
+            else if(cmd === 'mkdir') thist.innerHTML += `\nDirectory '${args[1] || 'new_folder'}' created.`;
+            else if(cmd === 'rm') thist.innerHTML += `\nRemoved '${args[1] || 'file'}'.`;
             else if(cmd === 'browser') openWin('b-win');
             else if(val !== "") thist.innerHTML += `\n'${cmd}' not found.`;
 
@@ -178,7 +164,14 @@
         }
     });
 
-    // DRAG LOGIC
+    // BROWSER 
+    function loadUrl() {
+        let url = document.getElementById('url-bar').value;
+        if(!url.includes('://')) url = 'https://' + url;
+        document.getElementById('browser-frame').src = url;
+    }
+
+    // DRAGGING
     document.querySelectorAll('.win').forEach(win => {
         const header = win.querySelector('.hdr');
         header.onmousedown = function(e) {
@@ -191,10 +184,9 @@
             };
             document.onmouseup = () => document.onmousemove = null;
         };
-        win.onmousedown = () => focusWin(win);
     });
 
-    switchFolder('Documents');
+    renderFiles('Documents');
 </script>
 
 </body>
